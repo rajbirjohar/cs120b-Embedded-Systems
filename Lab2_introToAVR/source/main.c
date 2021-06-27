@@ -14,22 +14,25 @@
 
 int main(void) {
     DDRA = 0x00; PORTA = 0xFF;
-    DDRB = 0xFF; PORTB = 0x00;
+    DDRC = 0xFF; PORTC = 0x00;
     
-    unsigned char garageSensor = 0x00;
-    unsigned char lightSensor = 0x00;
-    unsigned char led = 0x00;
+    unsigned char availParking; // tracks number of free spaces
+    unsigned char parkingSpace1 = 0x00; 
+    unsigned char parkingSpace2 = 0x01;  
+    unsigned char parkingSpace3 = 0x02; 
+    unsigned char parkingSpace4 = 0x03; 
 
     while(1){
-        garageSensor = PINA & 0x01;
-        lightSensor = PINA & 0x02;
+        availParking = 0x04;
+        parkingSpace1 = PINA & 0x01;
+        parkingSpace2 = PINA & 0x02;
+        parkingSpace3 = PINA & 0x04;
+        parkingSpace4 = PINA & 0x08;
 
-        if(garageSensor == 0x01 && lightSensor == 0x00){ 
-            led = 0x01;
-       } else{ 
-            led = 0x00;
-       }
-        PORTB = led;
+        if(parkingSpace1 == 0x01 || parkingSpace2 == 0x02 || parkingSpace3 == 0x04 || parkingSpace4 == 0x08){
+            availParking--;
+        }
+        PORTC = availParking; 
     }
     return 1;
 }
