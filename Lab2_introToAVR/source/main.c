@@ -29,10 +29,13 @@ int main(void) {
         parkingSpace3 = PINA & 0x04;
         parkingSpace4 = PINA & 0x08;
 
-        if(parkingSpace1 == 0x01 || parkingSpace2 == 0x02 || parkingSpace3 == 0x04 || parkingSpace4 == 0x08){
-            availParking--;
-        }
-        PORTC = availParking; 
+        if((parkingSpace1 == 0x01)
+        ||(parkingSpace2 == 0x02)
+        ||(parkingSpace3 == 0x04)
+        ||(parkingSpace4 == 0x08)){
+	    availParking--;
+	}
+	PORTC = availParking;
     }
     return 1;
 }
