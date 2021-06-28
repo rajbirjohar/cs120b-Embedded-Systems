@@ -18,9 +18,9 @@ int main(void) {
     
     unsigned char cntavail; // tracks number of free spaces
     unsigned char parkingSpace1 = 0x00; 
-    unsigned char parkingSpace2 = 0x01;  
-    unsigned char parkingSpace3 = 0x02; 
-    unsigned char parkingSpace4 = 0x03; 
+    unsigned char parkingSpace2 = 0x00;  
+    unsigned char parkingSpace3 = 0x00; 
+    unsigned char parkingSpace4 = 0x00; 
 
     while(1){
         cntavail = 0x04;
