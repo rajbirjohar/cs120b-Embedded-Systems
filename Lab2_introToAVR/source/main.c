@@ -41,6 +41,10 @@ int main(void) {
         if(parkingSpace4 == 0x08){
 	    cntavail--;
 	}
+	// sets PC7 to 1 if no more parking spaces
+	if(cntavail == 0x00){
+	cntavail = 0x80;
+	}
 	PORTC = cntavail;
     }
     return 1;
