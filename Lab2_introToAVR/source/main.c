@@ -19,7 +19,7 @@ int main(void) {
     DDRC = 0x00; PORTC = 0xFF;
     DDRD = 0xFF; PORTD = 0x00;
    
-    unsigned char weight, seatA, seatB, seatC, tempD = 0x00;
+    unsigned char weight = 0x00, seatA = 0x00, seatB = 0x00, seatC = 0x00, tempD = 0x00;
     
     while(1){
         seatA = PINA;
