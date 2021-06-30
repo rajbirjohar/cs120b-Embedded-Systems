@@ -16,8 +16,8 @@ enum ledStates
 {
     startLed,
     led1,
-    led2,
     firstButtonPress,
+    led2,
     secondButtonPress
 } ledState;
 
@@ -43,17 +43,6 @@ void Tick()
         }
         break;
 
-    case led2:
-        if (button == 0x01)
-        {
-            ledState = secondButtonPress;
-        }
-        else
-        {
-            ledState = led2;
-        }
-        break;
-
     case firstButtonPress:
         if (button == 0x00)
         {
@@ -62,6 +51,17 @@ void Tick()
         else
         {
             ledState = firstButtonPress;
+        }
+        break;
+
+    case led2:
+        if (button == 0x01)
+        {
+            ledState = secondButtonPress;
+        }
+        else
+        {
+            ledState = led2;
         }
         break;
 
