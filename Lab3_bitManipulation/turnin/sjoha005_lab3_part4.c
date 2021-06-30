@@ -27,9 +27,9 @@ int main(void)
     {
         tempA = PINA;
         // PA7 to PA4 and PB3 to PB0
-        PORTB = (tmpA >> 4) & 0x0F; 
+        PORTB = (tempA >> 4) & 0x0F; 
         // PA3 to PA0 and PB7 to PB4
-        PORTC = (tmpA << 4) & 0xF0; 
+        PORTC = (tempA << 4) & 0xF0; 
     }
 
     return 1;
