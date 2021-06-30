@@ -12,89 +12,142 @@
 #include "simAVRHeader.h"
 #endif
 
-enum ledStates
+enum buttonStates
 {
-    startLed,
-    led1,
-    firstButtonPress,
-    led2,
-    secondButtonPress
-} ledState;
+    startButton,
+    InitialState,
+    WaitState,
+    WaitState1,
+    WaitState2,
+    IncrementState,
+    DecrementState,
+    ResetState
+} buttonState;
 
-unsigned char button = 0x00;
-unsigned char tempB = 0x00;
+unsigned char IncrementStateButton = 0x00, DecrementStateButton = 0x00, tempC = 0x00;
 
 void Tick()
 {
-    switch (ledState)
+    switch (buttonState)
     {
-    case startLed:
-        ledState = led1;
+    case startButton:
+        buttonState = InitialState;
         break;
 
-    case led1:
-        if (button == 0x01)
+    case InitialState:
+        if (IncrementStateButton && DecrementStateButton)
         {
-            ledState = firstButtonPress;
+            buttonState = ResetState;
+        }
+        else if (IncrementStateButton)
+        {
+            buttonState = IncrementState;
+        }
+        else if (DecrementStateButton)
+        {
+            buttonState = DecrementState;
         }
         else
         {
-            ledState = led1;
+            buttonState = InitialState;
         }
         break;
 
-    case firstButtonPress:
-        if (button == 0x00)
+    case IncrementState:
+    case WaitState1:
+        if (IncrementStateButton && DecrementStateButton)
         {
-            ledState = led2;
+            buttonState = ResetState;
+        }
+        else if (!IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = InitialState;
+        }
+        else if (DecrementStateButton)
+        {
+            buttonState = DecrementState;
         }
         else
         {
-            ledState = firstButtonPress;
+            buttonState = WaitState1;
         }
         break;
 
-    case led2:
-        if (button == 0x01)
+    case DecrementState:
+    case WaitState2:
+        if (IncrementStateButton && DecrementStateButton)
         {
-            ledState = secondButtonPress;
+            buttonState = ResetState;
+        }
+        else if (!IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = InitialState;
+        }
+        else if (IncrementStateButton)
+        {
+            buttonState = IncrementState;
         }
         else
         {
-            ledState = led2;
+            buttonState = WaitState2;
         }
         break;
 
-    case secondButtonPress:
-        if (button == 0x00)
+    case ResetState:
+        if (!IncrementStateButton && !DecrementStateButton)
         {
-            ledState = led1;
+            buttonState = InitialState;
         }
         else
         {
-            ledState = secondButtonPress;
+            buttonState = WaitState;
         }
         break;
 
-    default:
-        ledState = startLed;
+    case WaitState:
+        if (!IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = InitialState;
+        }
+        else if (IncrementStateButton)
+        {
+            buttonState = IncrementState;
+        }
+        else if (DecrementStateButton)
+        {
+            buttonState = DecrementState;
+        }
+        else
+        {
+            buttonState = WaitState;
+        }
         break;
     }
 
-    switch (ledState)
+    switch (buttonState)
     {
-    case led1:
-        tempB = 0x01;
+    case InitialState:
+    case WaitState:
+    case WaitState1:
+    case WaitState2:
         break;
 
-    case firstButtonPress:
+    case IncrementState:
+        if (tempC < 9)
+        {
+            tempC++;
+        }
         break;
 
-    case led2:
-        tempB = 0x02;
+    case DecrementState:
+        if (tempC > 0)
+        {
+            tempC--;
+        }
         break;
 
-    case secondButtonPress:
+    case ResetState:
+        tempC = 0;
         break;
 
     default:
@@ -106,17 +159,19 @@ int main(void)
 {
     DDRA = 0x00;
     PORTA = 0xFF;
-    DDRB = 0xFF;
-    PORTB = 0x00;
+    DDRC = 0xFF;
+    PORTC = 0x00;
 
-    // Initializing
-    ledState = startLed;
+    buttonState = startButton;
+    tempC = 0x07;
 
     while (1)
     {
-        button = PINA & 0x01;
+        IncrementStateButton = PINA & 0x01;
+        DecrementStateButton = PINA & 0x02;
+        DecrementStateButton = (DecrementStateButton >> 1);
         Tick();
-        PORTB = tempB;
+        PORTC = tempC;
     }
 
     return 1;
