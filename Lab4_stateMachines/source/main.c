@@ -23,7 +23,7 @@ enum keypadStates
 
 } keypadState;
 
-unsigned char OutsideCombo[7] = {0x04, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01};
+unsigned char sequence[7] = {0x04, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01};
 unsigned char i;
 
 void Tick()
@@ -36,7 +36,7 @@ void Tick()
 
     case DoorLocked:
         i = 0x00;
-        if ((PINA & 0x07) == OutsideCombo[i])
+        if ((PINA & 0x07) == sequence[i])
         {
             keypadState = OutsideCombo;
         }
@@ -62,14 +62,14 @@ void Tick()
         break;
 
     case OutsideCombo:
-        if ((PINA & 0x07) == OutsideCombo[i])
+        if ((PINA & 0x07) == sequence[i])
         {
             keypadState = OutsideCombo;
         }
         else if (i + 1 == 6)
         {
             i++;
-            if ((PINA & 0x07) == OutsideCombo[i])
+            if ((PINA & 0x07) == sequence[i])
             {
                 keypadState = DoorUnlocked;
             }
@@ -81,7 +81,7 @@ void Tick()
         else if (i < 6)
         {
             i++;
-            if ((PINA & 0x07) == OutsideCombo[i])
+            if ((PINA & 0x07) == sequence[i])
             {
                 keypadState = OutsideCombo;
             }
@@ -93,14 +93,14 @@ void Tick()
         break;
 
     case InsideCombo:
-        if ((PINA & 0x87) == OutsideCombo[i])
+        if ((PINA & 0x87) == sequence[i])
         {
             keypadState = InsideCombo;
         }
         else if (i + 1 == 6)
         {
             i++;
-            if ((PINA & 0x87) == OutsideCombo[i])
+            if ((PINA & 0x87) == sequence[i])
             {
                 keypadState = DoorLocked;
             }
@@ -112,7 +112,7 @@ void Tick()
         else if (i < 6)
         {
             i++;
-            if ((PINA & 0x87) == OutsideCombo[i])
+            if ((PINA & 0x87) == sequence[i])
             {
                 keypadState = InsideCombo;
             }
@@ -131,7 +131,7 @@ void Tick()
         else
         {
             i = 0x00;
-            if ((PINA & 0x87) == OutsideCombo[i])
+            if ((PINA & 0x87) == sequence[i])
             {
                 keypadState = InsideCombo;
             }
@@ -149,7 +149,7 @@ void Tick()
         PORTB = 0x00;
         break;
 
-        case DoorUnlocked:
+    case DoorUnlocked:
         PORTB = 0x01;
         break;
 
