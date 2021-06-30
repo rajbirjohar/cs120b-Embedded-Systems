@@ -12,6 +12,151 @@
 #include "simAVRHeader.h"
 #endif
 
+enum buttonStates
+{
+    startButton,
+    InitialState,
+    WaitState,
+    WaitState1,
+    WaitState2,
+    IncrementState,
+    DecrementState,
+    ResetState
+} buttonState;
+
+unsigned char IncrementStateButton = 0x00, DecrementStateButton = 0x00, tempC = 0x00;
+
+void Tick()
+{
+    switch (buttonState)
+    {
+    case startButton:
+        buttonState = InitialState;
+        break;
+
+    case InitialState:
+        if (IncrementStateButton && DecrementStateButton)
+        {
+            buttonState = ResetState;
+        }
+        else if (IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = IncrementState;
+        }
+        else if (!IncrementStateButton && DecrementStateButton)
+        {
+            buttonState = DecrementState;
+        }
+        else
+        {
+            buttonState = InitialState;
+        }
+        break;
+
+    case IncrementState:
+    case WaitState1:
+        if (IncrementStateButton && DecrementStateButton)
+        {
+            buttonState = ResetState;
+        }
+        else if (!IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = InitialState;
+        }
+        else if (!IncrementStateButton && DecrementStateButton)
+        {
+            buttonState = DecrementState;
+        }
+        else
+        {
+            buttonState = WaitState1;
+        }
+        break;
+
+    case DecrementState:
+    case WaitState2:
+        if (IncrementStateButton && DecrementStateButton)
+        {
+            buttonState = ResetState;
+        }
+        else if (!IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = InitialState;
+        }
+        else if (IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = IncrementState;
+        }
+        else
+        {
+            buttonState = WaitState2;
+        }
+        break;
+
+    case ResetState:
+        if (!IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = InitialState;
+        }
+        else
+        {
+            buttonState = WaitState;
+        }
+        break;
+
+    case WaitState:
+        if (!IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = InitialState;
+        }
+        else if (IncrementStateButton && !DecrementStateButton)
+        {
+            buttonState = IncrementState;
+        }
+        else if (!IncrementStateButton && DecrementStateButton)
+        {
+            buttonState = DecrementState;
+        }
+        else
+        {
+            buttonState = WaitState;
+        }
+        break;
+    }
+
+    switch (buttonState)
+    {
+    case InitialState:
+        break;
+
+    case IncrementState:
+        if (tempC < 9)
+        {
+            tempC++;
+        }
+        break;
+
+    case DecrementState:
+        if (tempC > 0)
+        {
+            tempC--;
+        }
+        break;
+
+    case ResetState:
+        tempC = 0;
+        break;
+
+    case WaitState:
+    case WaitState1:
+    case WaitState2:
+        break;
+
+    default:
+        break;
+    }
+}
+
 int main(void)
 {
     DDRA = 0x00;
@@ -19,48 +164,16 @@ int main(void)
     DDRC = 0xFF;
     PORTC = 0x00;
 
-    unsigned char fuelLevel = 0x00, fuelIndicator = 0x00;
+    buttonState = startButton;
+    tempC = 0x07;
 
     while (1)
     {
-        fuelLevel = PINA & 0x0F;
-
-        // PC6
-        if (fuelLevel == 0x00)
-        {
-            fuelIndicator = 0x40; 
-        }
-        // PC6 and PC5
-        else if (fuelLevel == 0x01 || fuelLevel == 0x02)
-        {
-            fuelIndicator = 0x60; 
-        }
-        // PC6 to PC4
-        else if (fuelLevel == 0x03 || fuelLevel == 0x04)
-        {
-            fuelIndicator = 0x70; 
-        }
-        // PC5 to PC3
-        else if (fuelLevel == 0x05 || fuelLevel == 0x06)
-        {
-            fuelIndicator = 0x38; 
-        }
-        // PC5 to PC2
-        else if (fuelLevel == 0x07 || fuelLevel == 0x08 || fuelLevel == 0x09)
-        {
-            fuelIndicator = 0x3C; 
-        }
-        // PC5 to PC1
-        else if (fuelLevel == 0x0A || fuelLevel == 0x0B || fuelLevel == 0x0C)
-        {
-            fuelIndicator = 0x3E; 
-        }
-        // PC5 to PC0
-        else
-        {
-            fuelIndicator = 0x3F; 
-        }
-        PORTC = fuelIndicator;
+        IncrementStateButton = PINA & 0x01;
+        DecrementStateButton = PINA & 0x02;
+        DecrementStateButton = (DecrementStateButton >> 1);
+        Tick();
+        PORTC = tempC;
     }
 
     return 1;
