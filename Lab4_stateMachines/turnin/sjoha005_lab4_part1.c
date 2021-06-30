@@ -88,13 +88,14 @@ void Tick()
         break;
 
     case firstButtonPress:
-        break;
-
-    case led2:
         tempB = 0x02;
         break;
 
+    case led2:
+        break;
+
     case secondButtonPress:
+        tempB = 0x01;
         break;
 
     default:
