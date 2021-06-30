@@ -14,21 +14,24 @@
 
 enum keypadStates
 {
-    KeypadOn,
+    keypadOn,
     DoorLocked,
-    DoorUnlocked,
     PoundPressed,
-    Wait
+    Wait,
+    DoorUnlocked,
+    Restart,
+    PoundPressedInside,
+    WaitInside
 } keypadState;
 
-unsigned char xButton = 0x00, yButton = 0x00, poundButton = 0x00, insideButton = 0x00, doorStatus = 0x00;
+unsigned char xButton = 0x00, yButton = 0x00, poundButton = 0x00, InsideButton = 0x00, doorStatus = 0x00;
 unsigned char currentState;
 
 void Tick()
 {
     switch (keypadState)
     {
-    case KeypadOn:
+    case keypadOn:
         keypadState = DoorLocked;
         break;
 
@@ -74,13 +77,62 @@ void Tick()
         break;
 
     case DoorUnlocked:
-        if (insideButton)
+        if (InsideButton)
         {
             keypadState = DoorLocked;
+        }
+        else if (!xButton && !yButton && !poundButton && !InsideButton)
+        {
+            keypadState = Restart;
         }
         else
         {
             keypadState = DoorUnlocked;
+        }
+        break;
+
+    case Restart:
+        if (InsideButton)
+        {
+            keypadState = DoorLocked;
+        }
+        else if (poundButton)
+        {
+            keypadState = PoundPressedInside;
+        }
+        else
+        {
+            keypadState = Restart;
+        }
+        break;
+
+    case PoundPressedInside:
+        if (!xButton && !yButton && !poundButton && !InsideButton)
+        {
+            keypadState = WaitInside;
+        }
+        else if (poundButton)
+        {
+            keypadState = PoundPressedInside;
+        }
+        else
+        {
+            keypadState = Restart;
+        }
+        break;
+
+    case WaitInside:
+        if (yButton)
+        {
+            keypadState = DoorLocked;
+        }
+        else if (!xButton && !yButton && !poundButton && !InsideButton)
+        {
+            keypadState = WaitInside;
+        }
+        else
+        {
+            keypadState = Restart;
         }
         break;
     }
@@ -92,17 +144,29 @@ void Tick()
         currentState = DoorLocked;
         break;
 
+    case DoorUnlocked:
+        doorStatus = 0x01;
+        currentState = DoorUnlocked;
+        break;
+
     case PoundPressed:
         currentState = PoundPressed;
+        break;
+
+    case PoundPressedInside:
+        currentState = PoundPressedInside;
+        break;
+
+    case Restart:
+        currentState = Restart;
         break;
 
     case Wait:
         currentState = Wait;
         break;
 
-    case DoorUnlocked:
-        doorStatus = 0x01;
-        currentState = DoorUnlocked;
+    case WaitInside:
+        currentState = WaitInside;
         break;
 
     default:
@@ -119,14 +183,14 @@ int main(void)
     DDRC = 0xFF;
     PORTC = 0x00;
 
-    keypadState = KeypadOn;
+    keypadState = keypadOn;
 
     while (1)
     {
         xButton = PINA & 0x01;
         yButton = PINA & (0x01 << 1);
         poundButton = PINA & (0x01 << 2);
-        insideButton = PINA & (0x01 << 7);
+        InsideButton = PINA & (0x01 << 7);
 
         Tick();
 

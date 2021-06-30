@@ -92,17 +92,17 @@ void Tick()
         currentState = DoorLocked;
         break;
 
+    case DoorUnlocked:
+        doorStatus = 0x01;
+        currentState = DoorUnlocked;
+        break;
+
     case PoundPressed:
         currentState = PoundPressed;
         break;
 
     case Wait:
         currentState = Wait;
-        break;
-
-    case DoorUnlocked:
-        doorStatus = 0x01;
-        currentState = DoorUnlocked;
         break;
 
     default:
