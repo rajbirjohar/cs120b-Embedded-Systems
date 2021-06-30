@@ -12,65 +12,126 @@
 #include "simAVRHeader.h"
 #endif
 
+enum keypadStates
+{
+    KeypadOn,
+    DoorLocked,
+    DoorUnlocked,
+    PoundPressed,
+    Wait
+} keypadState;
+
+unsigned char xButton = 0x00, yButton = 0x00, poundButton = 0x00, insideButton = 0x00, doorStatus = 0x00;
+unsigned char currentState;
+
+void Tick()
+{
+    switch (keypadState)
+    {
+    case KeypadOn:
+        keypadState = DoorLocked;
+        break;
+
+    case DoorLocked:
+        if (poundButton)
+        {
+            keypadState = PoundPressed;
+        }
+        else
+        {
+            keypadState = DoorLocked;
+        }
+        break;
+
+    case PoundPressed:
+        if (!xButton && !yButton && !poundButton)
+        {
+            keypadState = Wait;
+        }
+        else if (poundButton)
+        {
+            keypadState = PoundPressed;
+        }
+        else
+        {
+            keypadState = DoorLocked;
+        }
+        break;
+
+    case Wait:
+        if (yButton)
+        {
+            keypadState = DoorUnlocked;
+        }
+        else if (!xButton && !yButton && !poundButton)
+        {
+            keypadState = Wait;
+        }
+        else
+        {
+            keypadState = DoorLocked;
+        }
+        break;
+
+    case DoorUnlocked:
+        if (insideButton)
+        {
+            keypadState = DoorLocked;
+        }
+        else
+        {
+            keypadState = DoorUnlocked;
+        }
+        break;
+    }
+
+    switch (keypadState)
+    {
+    case DoorLocked:
+        doorStatus = 0x00;
+        currentState = DoorLocked;
+        break;
+
+    case PoundPressed:
+        currentState = PoundPressed;
+        break;
+
+    case Wait:
+        currentState = Wait;
+        break;
+
+    case DoorUnlocked:
+        doorStatus = 0x01;
+        currentState = DoorUnlocked;
+        break;
+
+    default:
+        break;
+    }
+}
+
 int main(void)
 {
     DDRA = 0x00;
     PORTA = 0xFF;
+    DDRB = 0xFF;
+    PORTB = 0x00;
     DDRC = 0xFF;
     PORTC = 0x00;
 
-    unsigned char fuelLevel = 0x00, fuelIndicator = 0x00, tempA = 0x00;
+    keypadState = KeypadOn;
 
     while (1)
     {
-        fuelLevel = PINA & 0x0F;
-        // seat belt
-        tempA = PINA & 0x70;      
+        xButton = PINA & 0x01;
+        yButton = PINA & (0x01 << 1);
+        poundButton = PINA & (0x01 << 2);
+        insideButton = PINA & (0x01 << 7);
 
-        // PC6
-        if (fuelLevel == 0x00)
-        {
-            fuelIndicator = 0x40; 
-        }
-        // PC6 and PC5
-        else if (fuelLevel == 0x01 || fuelLevel == 0x02)
-        {
-            fuelIndicator = 0x60; 
-        }
-        // PC6 to PC4
-        else if (fuelLevel == 0x03 || fuelLevel == 0x04)
-        {
-            fuelIndicator = 0x70; 
-        }
-        // PC5 to PC3
-        else if (fuelLevel == 0x05 || fuelLevel == 0x06)
-        {
-            fuelIndicator = 0x38; 
-        }
-        // PC5 to PC2
-        else if (fuelLevel == 0x07 || fuelLevel == 0x08 || fuelLevel == 0x09)
-        {
-            fuelIndicator = 0x3C; 
-        }
-        // PC5 to PC1
-        else if (fuelLevel == 0x0A || fuelLevel == 0x0B || fuelLevel == 0x0C)
-        {
-            fuelIndicator = 0x3E; 
-        }
-        // PC5 to PC0
-        else
-        {
-            fuelIndicator = 0x3F; 
-        }
+        Tick();
 
-        if ((tempA >> 4) == 0x03)
-        {
-            PORTC = fuelIndicator | 0x80;
-        }
-        else
-        {
-            PORTC = fuelIndicator;
-        }
+        PORTB = doorStatus;
+        PORTC = currentState;
     }
 
     return 1;

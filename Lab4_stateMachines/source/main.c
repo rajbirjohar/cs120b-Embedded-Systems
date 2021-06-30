@@ -12,142 +12,97 @@
 #include "simAVRHeader.h"
 #endif
 
-enum buttonStates
+enum keypadStates
 {
-    startButton,
-    InitialState,
-    WaitState,
-    WaitState1,
-    WaitState2,
-    IncrementState,
-    DecrementState,
-    ResetState
-} buttonState;
+    KeypadOn,
+    DoorLocked,
+    DoorUnlocked,
+    PoundPressed,
+    Wait
+} keypadState;
 
-unsigned char IncrementStateButton = 0x00, DecrementStateButton = 0x00, tempC = 0x00;
+unsigned char xButton = 0x00, yButton = 0x00, poundButton = 0x00, insideButton = 0x00, doorStatus = 0x00;
+unsigned char currentState;
 
 void Tick()
 {
-    switch (buttonState)
+    switch (keypadState)
     {
-    case startButton:
-        buttonState = InitialState;
+    case KeypadOn:
+        keypadState = DoorLocked;
         break;
 
-    case InitialState:
-        if (IncrementStateButton && DecrementStateButton)
+    case DoorLocked:
+        if (poundButton)
         {
-            buttonState = ResetState;
-        }
-        else if (IncrementStateButton)
-        {
-            buttonState = IncrementState;
-        }
-        else if (DecrementStateButton)
-        {
-            buttonState = DecrementState;
+            keypadState = PoundPressed;
         }
         else
         {
-            buttonState = InitialState;
+            keypadState = DoorLocked;
         }
         break;
 
-    case IncrementState:
-    case WaitState1:
-        if (IncrementStateButton && DecrementStateButton)
+    case PoundPressed:
+        if (!xButton && !yButton && !poundButton)
         {
-            buttonState = ResetState;
+            keypadState = Wait;
         }
-        else if (!IncrementStateButton && !DecrementStateButton)
+        else if (poundButton)
         {
-            buttonState = InitialState;
-        }
-        else if (DecrementStateButton)
-        {
-            buttonState = DecrementState;
+            keypadState = PoundPressed;
         }
         else
         {
-            buttonState = WaitState1;
+            keypadState = DoorLocked;
         }
         break;
 
-    case DecrementState:
-    case WaitState2:
-        if (IncrementStateButton && DecrementStateButton)
+    case Wait:
+        if (yButton)
         {
-            buttonState = ResetState;
+            keypadState = DoorUnlocked;
         }
-        else if (!IncrementStateButton && !DecrementStateButton)
+        else if (!xButton && !yButton && !poundButton)
         {
-            buttonState = InitialState;
-        }
-        else if (IncrementStateButton)
-        {
-            buttonState = IncrementState;
+            keypadState = Wait;
         }
         else
         {
-            buttonState = WaitState2;
+            keypadState = DoorLocked;
         }
         break;
 
-    case ResetState:
-        if (!IncrementStateButton && !DecrementStateButton)
+    case DoorUnlocked:
+        if (insideButton)
         {
-            buttonState = InitialState;
+            keypadState = DoorLocked;
         }
         else
         {
-            buttonState = WaitState;
-        }
-        break;
-
-    case WaitState:
-        if (!IncrementStateButton && !DecrementStateButton)
-        {
-            buttonState = InitialState;
-        }
-        else if (IncrementStateButton)
-        {
-            buttonState = IncrementState;
-        }
-        else if (DecrementStateButton)
-        {
-            buttonState = DecrementState;
-        }
-        else
-        {
-            buttonState = WaitState;
+            keypadState = DoorUnlocked;
         }
         break;
     }
 
-    switch (buttonState)
+    switch (keypadState)
     {
-    case InitialState:
-    case WaitState:
-    case WaitState1:
-    case WaitState2:
+    case DoorLocked:
+        doorStatus = 0x00;
+        currentState = DoorLocked;
         break;
 
-    case IncrementState:
-        if (tempC < 9)
-        {
-            tempC++;
-        }
+    case PoundPressed:
+        currentState = PoundPressed;
         break;
 
-    case DecrementState:
-        if (tempC > 0)
-        {
-            tempC--;
-        }
+    case Wait:
+        currentState = Wait;
         break;
 
-    case ResetState:
-        tempC = 0;
+    case DoorUnlocked:
+        doorStatus = 0x01;
+        currentState = DoorUnlocked;
         break;
 
     default:
@@ -159,19 +114,24 @@ int main(void)
 {
     DDRA = 0x00;
     PORTA = 0xFF;
+    DDRB = 0xFF;
+    PORTB = 0x00;
     DDRC = 0xFF;
     PORTC = 0x00;
 
-    buttonState = startButton;
-    tempC = 0x07;
+    keypadState = KeypadOn;
 
     while (1)
     {
-        IncrementStateButton = PINA & 0x01;
-        DecrementStateButton = PINA & 0x02;
-        DecrementStateButton = (DecrementStateButton >> 1);
+        xButton = PINA & 0x01;
+        yButton = PINA & (0x01 << 1);
+        poundButton = PINA & (0x01 << 2);
+        insideButton = PINA & (0x01 << 7);
+
         Tick();
-        PORTC = tempC;
+
+        PORTB = doorStatus;
+        PORTC = currentState;
     }
 
     return 1;
