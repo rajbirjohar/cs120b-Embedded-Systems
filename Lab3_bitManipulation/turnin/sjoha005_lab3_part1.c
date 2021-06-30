@@ -12,24 +12,41 @@
 #include "simAVRHeader.h"
 #endif
 
-int main(void) {
+int main(void)
+{
     /* Insert DDR and PORT initializations */
-    DDRA = 0x00; PORTA = 0xFF;
-    DDRB = 0x00; PORTB = 0xFF;
-    DDRC = 0xFF; PORTC = 0x00;
+    DDRA = 0x00;
+    PORTA = 0xFF;
+    DDRB = 0x00;
+    PORTB = 0xFF;
+    DDRC = 0xFF;
+    PORTC = 0x00;
     /* Insert your solution below */
 
-    unsigned char onesCount = 0x00, currentPin = 0x01, i;    
+    unsigned char tempA = 0x00, tempB = 0x00, currentBit = 0x00;
+    unsigned char onesCount;
+    unsigned char i;
 
-    while (1) {
-        for(i = 0; i < 9; i++){
-           if(PINA & currentPin || PINB & currentPin){
-               onesCount++;
-           }
-           currentPin *= 2;
+    while (1)
+    {
+        tempA = PINA;
+        tempB = PINB;
+        onesCount = 0x00;
+
+        for (i = 0; i < 8; ++i)
+        {
+            currentBit = (tempA >> i) & 0x01;
+            if (currentBit != 0)
+            {
+                onesCount++;
+            }
+            currentBit = (tempB >> i) & 0x01;
+            if (currentBit != 0)
+            {
+                onesCount++;
+            }
         }
         PORTC = onesCount;
-        onesCount = 0x00;
     }
     return 1;
 }

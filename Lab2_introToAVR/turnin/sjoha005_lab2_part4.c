@@ -40,6 +40,7 @@ int main(void) {
         }
         
         weight = weight & 0xFC;
+        weight = weight >> 2;
         PORTD = weight | tempD;
     } 
     
