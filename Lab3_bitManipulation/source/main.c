@@ -19,9 +19,7 @@ int main(void)
     DDRD = 0x00;
     PORTD = 0xFF;
 
-    unsigned char minWeight = 0x00;
-    unsigned char maxWeight = 0x00;
-    unsigned char airBag;
+    unsigned char minWeight = 0x00, maxWeight = 0x00, airBag;
 
     while (1)
     {
