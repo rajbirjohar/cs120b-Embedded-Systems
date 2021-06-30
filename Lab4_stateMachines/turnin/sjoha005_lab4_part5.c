@@ -12,34 +12,167 @@
 #include "simAVRHeader.h"
 #endif
 
+enum keypadStates
+{
+    keypadOn,
+    DoorLocked,
+    DoorUnlocked,
+    OutsideCombo,
+    InsideCombo,
+    Restart
+
+} keypadState;
+
+unsigned char OutsideCombo[7] = {0x04, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01};
+unsigned char i;
+
+void Tick()
+{
+    switch (keypadState)
+    {
+    case keypadOn:
+        keypadState = DoorLocked;
+        break;
+
+    case DoorLocked:
+        i = 0x00;
+        if ((PINA & 0x07) == OutsideCombo[i])
+        {
+            keypadState = OutsideCombo;
+        }
+        else
+        {
+            keypadState = DoorLocked;
+        }
+        break;
+
+    case DoorUnlocked:
+        if ((PINA & 0x87) == 0x80)
+        {
+            keypadState = DoorLocked;
+        }
+        else if ((PINA & 0x87) == 0x00)
+        {
+            keypadState = Restart;
+        }
+        else
+        {
+            keypadState = DoorUnlocked;
+        }
+        break;
+
+    case OutsideCombo:
+        if ((PINA & 0x07) == OutsideCombo[i])
+        {
+            keypadState = OutsideCombo;
+        }
+        else if (i + 1 == 6)
+        {
+            i++;
+            if ((PINA & 0x07) == OutsideCombo[i])
+            {
+                keypadState = DoorUnlocked;
+            }
+            else
+            {
+                keypadState = DoorLocked;
+            }
+        }
+        else if (i < 6)
+        {
+            i++;
+            if ((PINA & 0x07) == OutsideCombo[i])
+            {
+                keypadState = OutsideCombo;
+            }
+            else
+            {
+                keypadState = DoorLocked;
+            }
+        }
+        break;
+
+    case InsideCombo:
+        if ((PINA & 0x87) == OutsideCombo[i])
+        {
+            keypadState = InsideCombo;
+        }
+        else if (i + 1 == 6)
+        {
+            i++;
+            if ((PINA & 0x87) == OutsideCombo[i])
+            {
+                keypadState = DoorLocked;
+            }
+            else
+            {
+                keypadState = Restart;
+            }
+        }
+        else if (i < 6)
+        {
+            i++;
+            if ((PINA & 0x87) == OutsideCombo[i])
+            {
+                keypadState = InsideCombo;
+            }
+            else
+            {
+                keypadState = Restart;
+            }
+        }
+        break;
+
+    case Restart:
+        if ((PINA & 0x87) == 0x80)
+        {
+            keypadState = DoorLocked;
+        }
+        else
+        {
+            i = 0x00;
+            if ((PINA & 0x87) == OutsideCombo[i])
+            {
+                keypadState = InsideCombo;
+            }
+            else
+            {
+                keypadState = Restart;
+            }
+        }
+        break;
+    }
+
+    switch (keypadState)
+    {
+    case DoorLocked:
+        PORTB = 0x00;
+        break;
+
+    case DoorUnlocked:
+        PORTB = 0x01;
+        break;
+
+    case OutsideCombo:
+    case InsideCombo:
+    case Restart:
+        break;
+
+    default:
+        break;
+    }
+}
+
 int main(void)
 {
-    DDRB = 0xFE;
-    PORTB = 0x01;
-    DDRD = 0x00;
-    PORTD = 0xFF;
-
-    unsigned char minWeight = 0x00, maxWeight = 0x00, airBag;
+    DDRA = 0x00;
+    PORTA = 0xFF;
+    DDRB = 0xFF;
+    PORTB = 0x00;
 
     while (1)
     {
-        minWeight = PINB & 0x01;
-        maxWeight = PIND;
-
-        airBag = 0x00;
-
-        if ((minWeight == 0 && maxWeight >= 0x46) || 
-            (minWeight == 1 && maxWeight >= 0x45))
-        {
-            airBag = 0x02;
-        }
-        else if ((minWeight == 0 && maxWeight > 0x05) || 
-                 (minWeight == 1 && maxWeight > 4))
-        {
-            airBag = 0x04;
-        }
-
-        PORTB = airBag;
+        Tick();
     }
 
     return 1;

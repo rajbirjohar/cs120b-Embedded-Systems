@@ -16,16 +16,15 @@ enum keypadStates
 {
     keypadOn,
     DoorLocked,
-    PoundPressed,
-    Wait,
     DoorUnlocked,
-    Restart,
-    PoundPressedInside,
-    WaitInside
+    OutsideCombo,
+    InsideCombo,
+    Restart
+
 } keypadState;
 
-unsigned char xButton = 0x00, yButton = 0x00, poundButton = 0x00, InsideButton = 0x00, doorStatus = 0x00;
-unsigned char currentState;
+unsigned char OutsideCombo[7] = {0x04, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01};
+unsigned char i;
 
 void Tick()
 {
@@ -36,39 +35,10 @@ void Tick()
         break;
 
     case DoorLocked:
-        if (poundButton)
+        i = 0x00;
+        if ((PINA & 0x07) == OutsideCombo[i])
         {
-            keypadState = PoundPressed;
-        }
-        else
-        {
-            keypadState = DoorLocked;
-        }
-        break;
-
-    case PoundPressed:
-        if (!xButton && !yButton && !poundButton)
-        {
-            keypadState = Wait;
-        }
-        else if (poundButton)
-        {
-            keypadState = PoundPressed;
-        }
-        else
-        {
-            keypadState = DoorLocked;
-        }
-        break;
-
-    case Wait:
-        if (yButton)
-        {
-            keypadState = DoorUnlocked;
-        }
-        else if (!xButton && !yButton && !poundButton)
-        {
-            keypadState = Wait;
+            keypadState = OutsideCombo;
         }
         else
         {
@@ -77,11 +47,11 @@ void Tick()
         break;
 
     case DoorUnlocked:
-        if (InsideButton)
+        if ((PINA & 0x87) == 0x80)
         {
             keypadState = DoorLocked;
         }
-        else if (!xButton && !yButton && !poundButton && !InsideButton)
+        else if ((PINA & 0x87) == 0x00)
         {
             keypadState = Restart;
         }
@@ -91,48 +61,84 @@ void Tick()
         }
         break;
 
+    case OutsideCombo:
+        if ((PINA & 0x07) == OutsideCombo[i])
+        {
+            keypadState = OutsideCombo;
+        }
+        else if (i + 1 == 6)
+        {
+            i++;
+            if ((PINA & 0x07) == OutsideCombo[i])
+            {
+                keypadState = DoorUnlocked;
+            }
+            else
+            {
+                keypadState = DoorLocked;
+            }
+        }
+        else if (i < 6)
+        {
+            i++;
+            if ((PINA & 0x07) == OutsideCombo[i])
+            {
+                keypadState = OutsideCombo;
+            }
+            else
+            {
+                keypadState = DoorLocked;
+            }
+        }
+        break;
+
+    case InsideCombo:
+        if ((PINA & 0x87) == OutsideCombo[i])
+        {
+            keypadState = InsideCombo;
+        }
+        else if (i + 1 == 6)
+        {
+            i++;
+            if ((PINA & 0x87) == OutsideCombo[i])
+            {
+                keypadState = DoorLocked;
+            }
+            else
+            {
+                keypadState = Restart;
+            }
+        }
+        else if (i < 6)
+        {
+            i++;
+            if ((PINA & 0x87) == OutsideCombo[i])
+            {
+                keypadState = InsideCombo;
+            }
+            else
+            {
+                keypadState = Restart;
+            }
+        }
+        break;
+
     case Restart:
-        if (InsideButton)
+        if ((PINA & 0x87) == 0x80)
         {
             keypadState = DoorLocked;
         }
-        else if (poundButton)
-        {
-            keypadState = PoundPressedInside;
-        }
         else
         {
-            keypadState = Restart;
-        }
-        break;
-
-    case PoundPressedInside:
-        if (!xButton && !yButton && !poundButton && !InsideButton)
-        {
-            keypadState = WaitInside;
-        }
-        else if (poundButton)
-        {
-            keypadState = PoundPressedInside;
-        }
-        else
-        {
-            keypadState = Restart;
-        }
-        break;
-
-    case WaitInside:
-        if (yButton)
-        {
-            keypadState = DoorLocked;
-        }
-        else if (!xButton && !yButton && !poundButton && !InsideButton)
-        {
-            keypadState = WaitInside;
-        }
-        else
-        {
-            keypadState = Restart;
+            i = 0x00;
+            if ((PINA & 0x87) == OutsideCombo[i])
+            {
+                keypadState = InsideCombo;
+            }
+            else
+            {
+                keypadState = Restart;
+            }
         }
         break;
     }
@@ -140,33 +146,16 @@ void Tick()
     switch (keypadState)
     {
     case DoorLocked:
-        doorStatus = 0x00;
-        currentState = DoorLocked;
+        PORTB = 0x00;
         break;
 
-    case DoorUnlocked:
-        doorStatus = 0x01;
-        currentState = DoorUnlocked;
+        case DoorUnlocked:
+        PORTB = 0x01;
         break;
 
-    case PoundPressed:
-        currentState = PoundPressed;
-        break;
-
-    case PoundPressedInside:
-        currentState = PoundPressedInside;
-        break;
-
+    case OutsideCombo:
+    case InsideCombo:
     case Restart:
-        currentState = Restart;
-        break;
-
-    case Wait:
-        currentState = Wait;
-        break;
-
-    case WaitInside:
-        currentState = WaitInside;
         break;
 
     default:
@@ -180,22 +169,10 @@ int main(void)
     PORTA = 0xFF;
     DDRB = 0xFF;
     PORTB = 0x00;
-    DDRC = 0xFF;
-    PORTC = 0x00;
-
-    keypadState = keypadOn;
 
     while (1)
     {
-        xButton = PINA & 0x01;
-        yButton = PINA & (0x01 << 1);
-        poundButton = PINA & (0x01 << 2);
-        InsideButton = PINA & (0x01 << 7);
-
         Tick();
-
-        PORTB = doorStatus;
-        PORTC = currentState;
     }
 
     return 1;

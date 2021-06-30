@@ -15,19 +15,18 @@
 # that they are not ran in isolation but in the order shown and the state of the device is not reset or 
 # altered in between executions (unless preconditions are used).
 tests = [ 
-     {'description': 'PINB 0x01 PIND 0xE7 => PORTB: 0x03',
-     'steps': [ {'inputs': [('PINB', 0x01), ('PIND', 0xE7)], 'iterations': 2} ],
-     'expected': [('PORTB', 0x03)],
-     },
-     {'description': 'PINB 0x01 PIND 0x20 => PORTB: 0x05',
-     'steps': [ {'inputs': [('PINB', 0x01), ('PIND', 0x20)],'iterations': 2}, ],
-     'expected': [('PORTB', 0x05)],
-     },
-     {'description': 'PINB 0x02 PIND 0x02 => PORTB: 0x01',
-     'steps': [ {'inputs': [('PINB', 0x02), ('PIND', 0x02)],'iterations': 2}, ],
-     'expected': [('PORTB', 0x01)],
-     },
-     ]
+     {'description': 'PINA: 0x04, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01 => PORTB: 0x03',
+    'steps': [
+          {'inputs': [('PINA', 0x04)], 'iterations': 2},
+	     {'inputs': [('PINA', 0x00)], 'iterations': 2},
+	     {'inputs': [('PINA', 0x01)], 'iterations': 2},
+          {'inputs': [('PINA', 0x00)], 'iterations': 2},
+          {'inputs': [('PINA', 0x02)], 'iterations': 2},
+          {'inputs': [('PINA', 0x00)], 'iterations': 2},
+          {'inputs': [('PINA', 0x01)], 'iterations': 2}],
+    'expected': [('PORTB', 0x00)],
+    },
+    ]
 
 # Optionally you can add a set of "watch" variables these need to be global or static and may need
 # to be scoped at the function level (for static variables) if there are naming conflicts. The 
