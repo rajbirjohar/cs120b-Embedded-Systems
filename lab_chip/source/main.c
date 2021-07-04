@@ -19,10 +19,8 @@ enum lightsStates
     WaitState,
     HalfState,
     WaitState1,
-    HalfState2,
-    WaitState2,
     EndState,
-    WaitState3
+    WaitState2
 } lightsState;
 
 void Tick()
@@ -69,7 +67,7 @@ void Tick()
     case WaitState1:
         if (!(~PINA & 0x01))
         {
-            lightsState = HalfState2;
+            lightsState = EndState;
         }
         else
         {
@@ -77,47 +75,25 @@ void Tick()
         }
         break;
 
-    case HalfState2:
+    case EndState:
         if (~PINA & 0x01)
         {
             lightsState = WaitState2;
         }
         else
         {
-            lightsState = HalfState2;
+            lightsState = EndState;
         }
         break;
 
     case WaitState2:
         if (!(~PINA & 0x01))
         {
-            lightsState = EndState;
-        }
-        else
-        {
-            lightsState = WaitState2;
-        }
-        break;
-
-    case EndState:
-        if (~PINA & 0x01)
-        {
-            lightsState = WaitState3;
-        }
-        else
-        {
-            lightsState = EndState;
-        }
-        break;
-
-    case WaitState3:
-        if (!(~PINA & 0x01))
-        {
             lightsState = StartState;
         }
         else
         {
-            lightsState = WaitState3;
+            lightsState = WaitState2;
         }
         break;
     }
@@ -138,16 +114,10 @@ void Tick()
     case WaitState1:
         PORTB = 0x0C;
 
-    case HalfState2:
-        break;
-
-    case WaitState2:
-        PORTB = 0x03;
-
     case EndState:
         break;
 
-    case WaitState3:
+    case WaitState2:
         PORTB = 0x30;
         break;
 
