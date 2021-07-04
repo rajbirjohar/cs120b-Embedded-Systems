@@ -1,4 +1,4 @@
-/*	Author: lab
+/*	Author: sjoha005
  *  Partner(s) Name: 
  *	Lab Section:
  *	Assignment: Lab #  Exercise #
