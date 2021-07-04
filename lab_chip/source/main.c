@@ -12,21 +12,50 @@
 #include "simAVRHeader.h"
 #endif
 
-int main(void) {
-    /* Insert DDR and PORT initializations */
-    DDRA = 0x00; PORTA = 0xFF;
-    DDRB = 0xFF; PORTB = 0x00;
-    unsigned char led = 0x00;
-    unsigned char button = 0x00;
-    /* Insert your solution below */
-    while (1) {
-        button = ~PINA & 0x01;
-	if(button){
-	    led = (led & 0xFC) | 0x01;
-	}else{
-	    led = (led & 0xFC) | 0x02;
-	}
-        PORTB = led;
+int main(void)
+{
+    DDRA = 0x00;
+    PORTA = 0xFF;
+    DDRC = 0xFF;
+    PORTC = 0x00;
+
+    unsigned char fuelLevel = 0x00, fuelIndicator = 0x00;
+
+    while (1)
+    {
+        fuelLevel = ~PINA & 0x0F;
+
+        if (fuelLevel == 0x00)
+        {
+            fuelIndicator = 0x40;
+        }
+        else if (fuelLevel == 0x01 || fuelLevel == 0x02)
+        {
+            fuelIndicator = 0x60;
+        }
+        else if (fuelLevel == 0x03 || fuelLevel == 0x04)
+        {
+            fuelIndicator = 0x70;
+        }
+        else if (fuelLevel == 0x05 || fuelLevel == 0x06)
+        {
+            fuelIndicator = 0x38;
+        }
+        else if (fuelLevel == 0x07 || fuelLevel == 0x08 || fuelLevel == 0x09)
+        {
+            fuelIndicator = 0x3C;
+        }
+        else if (fuelLevel == 0x0A || fuelLevel == 0x0B || fuelLevel == 0x0C)
+        {
+            fuelIndicator = 0x3E;
+        }
+        else
+        {
+            fuelIndicator = 0x3F;
+        }
+
+        PORTC = fuelIndicator;
     }
+
     return 1;
 }
