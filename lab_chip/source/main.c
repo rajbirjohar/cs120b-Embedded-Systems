@@ -127,19 +127,22 @@ void Tick()
     switch (buttonState)
     {
     case InitialState:
+    case WaitState:
+    case WaitState1:
+    case WaitState2:
         break;
 
     case IncrementState:
         if (tempC < 9)
         {
-            tempC = tempC + 1;
+            tempC++;
         }
         break;
 
     case DecrementState:
         if (tempC > 0)
         {
-            tempC = tempC - 1;
+            tempC--;
         }
         break;
 
@@ -147,16 +150,7 @@ void Tick()
         tempC = 0;
         break;
 
-    case WaitState:
-        break;
-
-    case WaitState1:
-        break;
-
-    case WaitState2:
-        break;
-
-    default:
+        default:
         break;
     }
 }
