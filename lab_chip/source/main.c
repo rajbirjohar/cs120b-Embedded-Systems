@@ -16,12 +16,12 @@ enum buttonStates
 {
     startButton,
     InitialState,
-    IncrementState,
-    DecrementState,
-    ResetState,
     WaitState,
     WaitState1,
-    WaitState2
+    WaitState2,
+    IncrementState,
+    DecrementState,
+    ResetState
 } buttonState;
 
 unsigned char IncrementStateButton = 0x00, DecrementStateButton = 0x00, tempC = 0x00;
@@ -39,11 +39,11 @@ void Tick()
         {
             buttonState = ResetState;
         }
-        else if (IncrementStateButton)
+        else if (IncrementStateButton && !DecrementStateButton)
         {
             buttonState = IncrementState;
         }
-        else if (!IncrementStateButton)
+        else if (!IncrementStateButton && DecrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -63,7 +63,7 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (DecrementStateButton)
+        else if (!IncrementStateButton && DecrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -83,7 +83,7 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (IncrementStateButton)
+        else if (IncrementStateButton && !DecrementStateButton)
         {
             buttonState = IncrementState;
         }
@@ -109,11 +109,11 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (IncrementStateButton)
+        else if (IncrementStateButton && !DecrementStateButton)
         {
             buttonState = IncrementState;
         }
-        else if (DecrementStateButton)
+        else if (!IncrementStateButton && DecrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -127,27 +127,33 @@ void Tick()
     switch (buttonState)
     {
     case InitialState:
-    case WaitState:
-    case WaitState1:
-    case WaitState2:
         break;
 
     case IncrementState:
         if (tempC < 9)
         {
-            tempC++;
+            tempC = tempC + 1;
         }
         break;
 
     case DecrementState:
         if (tempC > 0)
         {
-            tempC--;
+            tempC = tempC - 1;
         }
         break;
 
     case ResetState:
         tempC = 0;
+        break;
+
+    case WaitState:
+        break;
+
+    case WaitState1:
+        break;
+
+    case WaitState2:
         break;
 
     default:
