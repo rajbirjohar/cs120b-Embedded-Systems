@@ -147,7 +147,7 @@ void Tick()
     case EndState:
         break;
 
-    case WaitState2:
+    case WaitState3:
         PORTB = 0x30;
         break;
 
