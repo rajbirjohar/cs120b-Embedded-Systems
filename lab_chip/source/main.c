@@ -8,121 +8,18 @@
  *	code, is my own original work.
  */
 #include <avr/io.h>
-#include "timer.h"
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
 
-enum LEDStates
+void ADC_init()
 {
-    LEDStart,
-    LED1State,
-    LED2State,
-    LED3State,
-    MiddleState,
-    PressedState,
-    RestartState
-} LEDState;
-
-unsigned char button = 0x00;
-
-void Tick()
-{
-    switch (LEDState)
-    {
-    case LEDStart:
-        LEDState = LED1State;
-        break;
-
-    case LED1State:
-        if (button)
-        {
-            LEDState = PressedState;
-        }
-        else
-        {
-            LEDState = LED2State;
-        }
-        break;
-
-    case LED2State:
-        if (button)
-        {
-            LEDState = PressedState;
-        }
-        else
-        {
-            LEDState = LED3State;
-        }
-        break;
-
-    case LED3State:
-        if (button)
-        {
-            LEDState = PressedState;
-        }
-        else
-        {
-            LEDState = MiddleState;
-        }
-        break;
-
-    case MiddleState:
-        if (button)
-        {
-            LEDState = PressedState;
-        }
-        else
-        {
-            LEDState = LED1State;
-        }
-        break;
-
-    case PressedState:
-        if (button)
-        {
-            LEDState = PressedState;
-        }
-        else
-        {
-            LEDState = RestartState;
-        }
-        break;
-
-    case RestartState:
-        if (!button)
-        {
-            LEDState = RestartState;
-        }
-        else
-        {
-            LEDState = LED1State;
-        }
-        break;
-    }
-
-    switch (LEDState)
-    {
-    case LED1State:
-        PORTB = 0x01;
-        break;
-
-    case LED2State:
-    case MiddleState:
-        PORTB = 0x02;
-        break;
-
-    case LED3State:
-        PORTB = 0x04;
-        break;
-
-    case PressedState:
-    case RestartState:
-        break;
-
-    default:
-        break;
-    }
+    ADCSRA |= (1 << ADEN) | (1 << ADSC) | (1 << ADATE);
+    // ADEN: setting this bit enables analog-to-digital conversion
+    // ADSC: setting this bit starts the first conversion
+    // ADATE: setting this bit enables auto-triggering. Since we are
+    //		  in Free Running Mode, a new conversion will trigger whenever
+    //		  the previous conversion completes.
 }
 
 int main(void)
@@ -131,18 +28,18 @@ int main(void)
     PORTA = 0xFF;
     DDRB = 0xFF;
     PORTB = 0x00;
+    DDRD = 0xFF;
+    PORTB = 0x00;
 
-    TimerSet(30);
-    TimerOn();
-    LEDState = LEDStart;
+    unsigned short my_short = 0x00;
+
+    ADC_init();
 
     while (1)
     {
-        button = ~PINA & 0x01;
-        Tick();
-        while (!TimerFlag)
-            ;
-        TimerFlag = 0;
+        my_short = ADC;
+        PORTB = (char)my_short;
+        PORTD = (char)(my_short >> 8);
     }
 
     return 1;
