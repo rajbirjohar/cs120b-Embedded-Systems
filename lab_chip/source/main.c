@@ -8,117 +8,52 @@
  *	code, is my own original work.
  */
 #include <avr/io.h>
+#include "timer.h"
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
 
-enum lightsStates
+enum LEDStates
 {
-    LightsOn,
-    StartState,
-    WaitState,
-    HalfState,
-    WaitState1,
-    EndState,
-    WaitState2
-} lightsState;
+    LEDStart,
+    LED1State,
+    LED2State,
+    LED3State
+} LEDState;
 
 void Tick()
 {
-    switch (lightsState)
+    switch (LEDState)
     {
-    case LightsOn:
-        lightsState = StartState;
+    case LEDStart:
+        LEDState = LED1State;
         break;
 
-    case StartState:
-        if (~PINA & 0x01)
-        {
-            lightsState = WaitState;
-        }
-        else
-        {
-            lightsState = StartState;
-        }
+    case LED1State:
+        LEDState = LED2State;
         break;
 
-    case WaitState:
-        if (!(~PINA & 0x01))
-        {
-            lightsState = HalfState;
-        }
-        else
-        {
-            lightsState = WaitState;
-        }
+    case LED2State:
+        LEDState = LED3State;
         break;
 
-    case HalfState:
-        if (~PINA & 0x01)
-        {
-            lightsState = WaitState1;
-        }
-        else
-        {
-            lightsState = HalfState;
-        }
-        break;
-
-    case WaitState1:
-        if (!(~PINA & 0x01))
-        {
-            lightsState = EndState;
-        }
-        else
-        {
-            lightsState = WaitState1;
-        }
-        break;
-
-    case EndState:
-        if (~PINA & 0x01)
-        {
-            lightsState = WaitState2;
-        }
-        else
-        {
-            lightsState = EndState;
-        }
-        break;
-
-    case WaitState2:
-        if (!(~PINA & 0x01))
-        {
-            lightsState = StartState;
-        }
-        else
-        {
-            lightsState = WaitState2;
-        }
+    case LED3State:
+        LEDState = LED1State;
         break;
     }
 
-    switch (lightsState)
+    switch (LEDState)
     {
-    case StartState:
-        PORTB = 0x30;
+    case LED1State:
+        PORTB = 0x01;
         break;
 
-    case WaitState:
-        PORTB = 0x03;
+    case LED2State:
+        PORTB = 0x02;
         break;
 
-    case HalfState:
-        break;
-
-    case WaitState1:
-        PORTB = 0x0C;
-
-    case EndState:
-        break;
-
-    case WaitState2:
-        PORTB = 0x30;
+    case LED3State:
+        PORTB = 0x04;
         break;
 
     default:
@@ -128,16 +63,19 @@ void Tick()
 
 int main(void)
 {
-    DDRA = 0x00;
-    PORTA = 0xFF;
     DDRB = 0xFF;
     PORTB = 0x00;
 
-    lightsState = LightsOn;
+    TimerSet(100);
+    TimerOn();
+    LEDState = LEDStart;
 
     while (1)
     {
         Tick();
+        while (!TimerFlag)
+            ;
+        TimerFlag = 0;
     }
 
     return 1;
