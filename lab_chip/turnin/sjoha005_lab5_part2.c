@@ -39,11 +39,11 @@ void Tick()
         {
             buttonState = ResetState;
         }
-        else if (IncrementStateButton && !DecrementStateButton)
+        else if (IncrementStateButton)
         {
             buttonState = IncrementState;
         }
-        else if (!IncrementStateButton && DecrementStateButton)
+        else if (DecrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -63,7 +63,7 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (!IncrementStateButton && DecrementStateButton)
+        else if (DecrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -83,7 +83,7 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (IncrementStateButton && !DecrementStateButton)
+        else if (IncrementStateButton)
         {
             buttonState = IncrementState;
         }
@@ -109,11 +109,11 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (IncrementStateButton && !DecrementStateButton)
+        else if (IncrementStateButton)
         {
             buttonState = IncrementState;
         }
-        else if (!IncrementStateButton && DecrementStateButton)
+        else if (DecrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -127,33 +127,27 @@ void Tick()
     switch (buttonState)
     {
     case InitialState:
+    case WaitState:
+    case WaitState1:
+    case WaitState2:
         break;
 
     case IncrementState:
         if (tempC < 9)
         {
-            tempC = tempC + 1;
+            tempC++;
         }
         break;
 
     case DecrementState:
         if (tempC > 0)
         {
-            tempC = tempC - 1;
+            tempC--;
         }
         break;
 
     case ResetState:
         tempC = 0;
-        break;
-
-    case WaitState:
-        break;
-
-    case WaitState1:
-        break;
-
-    case WaitState2:
         break;
 
     default:

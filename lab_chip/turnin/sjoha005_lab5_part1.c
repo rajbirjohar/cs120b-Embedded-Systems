@@ -24,31 +24,37 @@ int main(void)
     while (1)
     {
         fuelLevel = ~PINA & 0x0F;
-
+        // PC6
         if (fuelLevel == 0x00)
         {
             fuelIndicator = 0x40;
         }
+        // PC6 and PC5
         else if (fuelLevel == 0x01 || fuelLevel == 0x02)
         {
             fuelIndicator = 0x60;
         }
+        // PC6 to PC4
         else if (fuelLevel == 0x03 || fuelLevel == 0x04)
         {
             fuelIndicator = 0x70;
         }
+        // PC5 to PC3
         else if (fuelLevel == 0x05 || fuelLevel == 0x06)
         {
             fuelIndicator = 0x38;
         }
+        // PC5 to PC2
         else if (fuelLevel == 0x07 || fuelLevel == 0x08 || fuelLevel == 0x09)
         {
             fuelIndicator = 0x3C;
         }
+        // PC5 to PC1
         else if (fuelLevel == 0x0A || fuelLevel == 0x0B || fuelLevel == 0x0C)
         {
             fuelIndicator = 0x3E;
         }
+        // PC5 to PC0
         else
         {
             fuelIndicator = 0x3F;
