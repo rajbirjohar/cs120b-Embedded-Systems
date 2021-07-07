@@ -28,8 +28,6 @@ int main(void)
     PORTA = 0xFF;
     DDRB = 0xFF;
     PORTB = 0x00;
-    DDRD = 0xFF;
-    PORTB = 0x00;
 
     unsigned short my_short = 0x00;
 
@@ -39,13 +37,37 @@ int main(void)
     {
         my_short = ADC;
 
-        if (my_short >= (475 / 2))
+        if (my_short >= 475)
         {
-            PORTB = 0x01;
+            PORTB = 0xFF;
+        }
+        else if (my_short >= (475 / 2))
+        {
+            PORTB = 0X7F;
+        }
+        else if (my_short >= (475 / 3))
+        {
+            PORTB = 0x3F;
+        }
+        else if (my_short >= (475 / 4))
+        {
+            PORTB = 0x1F;
+        }
+        else if (my_short >= (475 / 5))
+        {
+            PORTB = 0x0F;
+        }
+        else if (my_short >= (475 / 6))
+        {
+            PORTB = 0x07;
+        }
+        else if (my_short >= (475 / 7))
+        {
+            PORTB = 0x03;
         }
         else
         {
-            PORTB = 0x00;
+            PORTB = 0x01;
         }
     }
 
