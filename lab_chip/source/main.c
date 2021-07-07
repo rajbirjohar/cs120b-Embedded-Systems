@@ -38,8 +38,15 @@ int main(void)
     while (1)
     {
         my_short = ADC;
-        PORTB = (char)my_short;
-        PORTD = (char)(my_short >> 8);
+
+        if (my_short >= (1020 / 2))
+        {
+            PORTB = 0x01;
+        }
+        else
+        {
+            PORTB = 0x00;
+        }
     }
 
     return 1;
