@@ -12,11 +12,6 @@
 #include "simAVRHeader.h"
 #endif
 
-#include <avr/io.h>
-#ifdef _SIMULATE_
-#include "simAVRHeader.h"
-#endif
-
 void ADC_init()
 {
     ADCSRA |= (1 << ADEN) | (1 << ADSC) | (1 << ADATE);
