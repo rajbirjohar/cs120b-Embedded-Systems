@@ -76,14 +76,14 @@ void PWM_OffState()
 enum soundStates
 {
     SoundStart,
-    Sound1State,
-    Sound2State,
-    Sound3State,
-    Sound4State,
-    Sound5State,
-    Sound6State,
-    Sound7State,
-    Sound8State,
+    CState,
+    FState,
+    GState,
+    FState2,
+    EState,
+    BState,
+    AState,
+    GState2,
 } soundState;
 
 // C D E F G A B C
@@ -96,55 +96,59 @@ void Tick()
     switch (soundState)
     {
     case SoundStart:
-        soundState = Sound1State;
+        soundState = CState;
         break;
-    case Sound1State:
-        soundState = Sound2State;
+    case CState:
+        soundState = FState;
         break;
-    case Sound2State:
-        soundState = Sound3State;
+    case FState:
+        soundState = GState;
         break;
-    case Sound3State:
-        soundState = Sound4State;
+    case GState:
+        soundState = FState2;
         break;
-    case Sound4State:
-        soundState = Sound5State;
+    case FState2:
+        soundState = EState;
         break;
-    case Sound5State:
-        soundState = Sound6State;
+    case EState:
+        soundState = BState;
         break;
-    case Sound6State:
-        soundState = Sound7State;
+    case BState:
+        soundState = AState;
         break;
-    case Sound7State:
-        soundState = Sound8State;
+    case AState:
+        soundState = GState2;
         break;
-    case Sound8State:
-        soundState = Sound1State;
+    case GState2:
+        soundState = CState;
         break;
     }
 
     switch (soundState)
     {
-    case Sound1State:
+    case CState:
         set_PWM(musicalNotes[1]);
         break;
-    case Sound5State:
-        set_PWM(musicalNotes[3]);
-        break;
-    case Sound4State:
-    case Sound2State:
+    case FState:
         set_PWM(musicalNotes[4]);
         break;
-    case Sound8State:
-    case Sound3State:
+    case GState:
         set_PWM(musicalNotes[5]);
         break;
-    case Sound7State:
+    case FState2:
+        set_PWM(musicalNotes[4]);
+        break;
+    case EState:
+        set_PWM(musicalNotes[3]);
+        break;
+    case BState:
+        set_PWM(musicalNotes[7]);
+        break;
+    case AState:
         set_PWM(musicalNotes[6]);
         break;
-    case Sound6State:
-        set_PWM(musicalNotes[7]);
+    case GState2:
+        set_PWM(musicalNotes[5]);
         break;
 
     default:
