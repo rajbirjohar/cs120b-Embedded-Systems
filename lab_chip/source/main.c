@@ -66,7 +66,7 @@ void PWM_on()
     set_PWM(0);
 }
 
-void PWM_off()
+void PWM_OffState()
 {
     TCCR3A = 0x00;
     TCCR3B = 0x00;
@@ -75,91 +75,117 @@ void PWM_off()
 enum soundStates
 {
     Sound_Start,
-    WaitState,
-    C4Sound,
-    D4Sound,
-    E4Sound
+    OffState,
+    WaitOnState,
+    OnState,
+    WaitOffState,
+    Up,
+    Down
 } soundState;
 
-unsigned char C4 = 0x00, D4 = 0x00, E4 = 0x00;
+const double musicalNotes[8] = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25};
+unsigned char i, power = 0x00, up = 0x00, down = 0x00;
 
 void Tick()
 {
     switch (soundState)
     {
     case Sound_Start:
-        soundState = WaitState;
+        soundState = OffState;
         break;
 
-    case WaitState:
-        if (C4 && !D4 && !E4)
+    case OffState:
+        i = 0x00;
+        if (power)
         {
-            soundState = C4Sound;
-        }
-        else if (!C4 && D4 && !E4)
-        {
-            soundState = D4Sound;
-        }
-        else if (!C4 && !D4 && E4)
-        {
-            soundState = E4Sound;
+            soundState = WaitOnState;
         }
         else
         {
-            soundState = WaitState;
+            soundState = OffState;
         }
         break;
 
-    case C4Sound:
-        if (C4 && !D4 && !E4)
+    case WaitOnState:
+        if (!power)
         {
-            soundState = C4Sound;
+            soundState = OnState;
         }
         else
         {
-            soundState = WaitState;
+            soundState = WaitOnState;
         }
         break;
 
-    case D4Sound:
-        if (!C4 && D4 && !E4)
+    case OnState:
+        if (up && (i < 7))
         {
-            soundState = D4Sound;
+            i = i + 1;
+            soundState = Up;
+        }
+        else if (down && (i > 0))
+        {
+            i = i - 1;
+            soundState = Down;
+        }
+        else if (power)
+        {
+            soundState = WaitOffState;
         }
         else
         {
-            soundState = WaitState;
+            soundState = OnState;
         }
         break;
 
-    case E4Sound:
-        if (!C4 && !D4 && E4)
+    case WaitOffState:
+        if (!power)
         {
-            soundState = E4Sound;
+            soundState = OffState;
         }
         else
         {
-            soundState = WaitState;
+            soundState = WaitOffState;
+        }
+        break;
+
+    case Up:
+        if (!up)
+        {
+            soundState = OnState;
+        }
+        else
+        {
+            soundState = Up;
+        }
+        break;
+
+    case Down:
+        if (!down)
+        {
+            soundState = OnState;
+        }
+        else
+        {
+            soundState = Down;
         }
         break;
     }
 
     switch (soundState)
     {
-    case WaitState:
-        set_PWM(0);
+    case OffState:
+        set_PWM(0.0);
         break;
 
-    case C4Sound:
-        set_PWM(261.63);
+    case OnState:
+        set_PWM(musicalNotes[i]);
         break;
 
-    case D4Sound:
-        set_PWM(293.66);
-        break;
-
-    case E4Sound:
-        set_PWM(329.63);
+    case WaitOnState:
+    case WaitOffState:
+    case Up:
+    case Down:
         break;
 
     default:
@@ -171,7 +197,7 @@ int main(void)
 {
     DDRA = 0x00;
     PORTA = 0xFF;
-    DDRB = 0x40;
+    DDRB = 0xFF;
     PORTB = 0x00;
 
     PWM_on();
@@ -179,9 +205,9 @@ int main(void)
 
     while (1)
     {
-        C4 = ~PINA & 0x01;
-        D4 = ~PINA & 0x02;
-        E4 = ~PINA & 0x04;
+        power = ~PINA & 0x01;
+        up = ~PINA & 0x02;
+        down = ~PINA & 0x04;
 
         Tick();
     }
