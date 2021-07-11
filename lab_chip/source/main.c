@@ -86,6 +86,7 @@ enum soundStates
     Sound8State,
 } soundState;
 
+// C D E F G A B C
 const double musicalNotes[8] = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25};
 unsigned char i;
 
@@ -125,28 +126,28 @@ void Tick()
     switch (soundState)
     {
     case Sound1State:
-        set_PWM(musicalNotes[1]);
+        set_PWM(musicalNotes[7]);
         break;
     case Sound2State:
-        set_PWM(musicalNotes[2]);
+        set_PWM(musicalNotes[3]);
         break;
     case Sound3State:
-        set_PWM(musicalNotes[3]);
+        set_PWM(musicalNotes[5]);
         break;
     case Sound4State:
         set_PWM(musicalNotes[4]);
         break;
     case Sound5State:
-        set_PWM(musicalNotes[5]);
+        set_PWM(musicalNotes[3]);
         break;
     case Sound6State:
-        set_PWM(musicalNotes[6]);
-        break;
-    case Sound7State:
         set_PWM(musicalNotes[7]);
         break;
+    case Sound7State:
+        set_PWM(musicalNotes[6]);
+        break;
     case Sound8State:
-        set_PWM(musicalNotes[8]);
+        set_PWM(musicalNotes[4]);
         break;
 
     default:
