@@ -8,6 +8,7 @@
  *	code, is my own original work.
  */
 #include <avr/io.h>
+#include "timer.h"
 #ifdef _SIMULATE_
 #include "simAVRHeader.h"
 #endif
@@ -74,118 +75,78 @@ void PWM_OffState()
 
 enum soundStates
 {
-    Sound_Start,
-    OffState,
-    WaitOnState,
-    OnState,
-    WaitOffState,
-    Up,
-    Down
+    SoundStart,
+    Sound1State,
+    Sound2State,
+    Sound3State,
+    Sound4State,
+    Sound5State,
+    Sound6State,
+    Sound7State,
+    Sound8State,
 } soundState;
 
 const double musicalNotes[8] = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25};
-unsigned char i, power = 0x00, up = 0x00, down = 0x00;
+unsigned char i;
 
 void Tick()
 {
     switch (soundState)
     {
-    case Sound_Start:
-        soundState = OffState;
+    case SoundStart:
+        soundState = Sound1State;
         break;
-
-    case OffState:
-        i = 0x00;
-        if (power)
-        {
-            soundState = WaitOnState;
-        }
-        else
-        {
-            soundState = OffState;
-        }
+    case Sound1State:
+        soundState = Sound2State;
         break;
-
-    case WaitOnState:
-        if (!power)
-        {
-            soundState = OnState;
-        }
-        else
-        {
-            soundState = WaitOnState;
-        }
+    case Sound2State:
+        soundState = Sound3State;
         break;
-
-    case OnState:
-        if (up && (i < 7))
-        {
-            i++;
-            soundState = Up;
-        }
-        else if (down && (i > 0))
-        {
-            i--;
-            soundState = Down;
-        }
-        else if (power)
-        {
-            soundState = WaitOffState;
-        }
-        else
-        {
-            soundState = OnState;
-        }
+    case Sound3State:
+        soundState = Sound4State;
         break;
-
-    case WaitOffState:
-        if (!power)
-        {
-            soundState = OffState;
-        }
-        else
-        {
-            soundState = WaitOffState;
-        }
+    case Sound4State:
+        soundState = Sound5State;
         break;
-
-    case Up:
-        if (!up)
-        {
-            soundState = OnState;
-        }
-        else
-        {
-            soundState = Up;
-        }
+    case Sound5State:
+        soundState = Sound6State;
         break;
-
-    case Down:
-        if (!down)
-        {
-            soundState = OnState;
-        }
-        else
-        {
-            soundState = Down;
-        }
+    case Sound6State:
+        soundState = Sound7State;
+        break;
+    case Sound7State:
+        soundState = Sound8State;
+        break;
+    case Sound8State:
+        soundState = Sound1State;
         break;
     }
 
     switch (soundState)
     {
-    case OffState:
-        set_PWM(0.0);
+    case Sound1State:
+        set_PWM(musicalNotes[1]);
         break;
-
-    case OnState:
-        set_PWM(musicalNotes[i]);
+    case Sound2State:
+        set_PWM(musicalNotes[2]);
         break;
-
-    case WaitOnState:
-    case WaitOffState:
-    case Up:
-    case Down:
+    case Sound3State:
+        set_PWM(musicalNotes[3]);
+        break;
+    case Sound4State:
+        set_PWM(musicalNotes[4]);
+        break;
+    case Sound5State:
+        set_PWM(musicalNotes[5]);
+        break;
+    case Sound6State:
+        set_PWM(musicalNotes[6]);
+        break;
+    case Sound7State:
+        set_PWM(musicalNotes[7]);
+        break;
+    case Sound8State:
+        set_PWM(musicalNotes[8]);
         break;
 
     default:
@@ -199,17 +160,17 @@ int main(void)
     PORTA = 0xFF;
     DDRB = 0xFF;
     PORTB = 0x00;
-
+    TimerSet(500);
+    TimerOn();
     PWM_on();
-    soundState = Sound_Start;
+    soundState = SoundStart;
 
     while (1)
     {
-        power = ~PINA & 0x01;
-        up = ~PINA & 0x02;
-        down = ~PINA & 0x04;
-
         Tick();
+        while (!TimerFlag)
+            ;
+        TimerFlag = 0;
     }
 
     return 1;

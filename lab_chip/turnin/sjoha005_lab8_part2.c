@@ -74,7 +74,7 @@ void PWM_OffState()
 
 enum soundStates
 {
-    Sound_Start,
+    SoundStart,
     OffState,
     WaitOnState,
     OnState,
@@ -90,7 +90,7 @@ void Tick()
 {
     switch (soundState)
     {
-    case Sound_Start:
+    case SoundStart:
         soundState = OffState;
         break;
 
@@ -201,7 +201,7 @@ int main(void)
     PORTB = 0x00;
 
     PWM_on();
-    soundState = Sound_Start;
+    soundState = SoundStart;
 
     while (1)
     {
