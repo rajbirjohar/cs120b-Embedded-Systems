@@ -126,28 +126,28 @@ void Tick()
     switch (soundState)
     {
     case Sound1State:
-        set_PWM(musicalNotes[7]);
+        set_PWM(musicalNotes[1]);
         break;
     case Sound2State:
-        set_PWM(musicalNotes[3]);
+        set_PWM(musicalNotes[1]);
         break;
     case Sound3State:
         set_PWM(musicalNotes[5]);
         break;
     case Sound4State:
-        set_PWM(musicalNotes[4]);
+        set_PWM(musicalNotes[5]);
         break;
     case Sound5State:
-        set_PWM(musicalNotes[3]);
-        break;
-    case Sound6State:
-        set_PWM(musicalNotes[7]);
-        break;
-    case Sound7State:
         set_PWM(musicalNotes[6]);
         break;
+    case Sound6State:
+        set_PWM(musicalNotes[6]);
+        break;
+    case Sound7State:
+        set_PWM(musicalNotes[5]);
+        break;
     case Sound8State:
-        set_PWM(musicalNotes[4]);
+        set_PWM(musicalNotes[1]);
         break;
 
     default:
