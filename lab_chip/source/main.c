@@ -76,7 +76,6 @@ void PWM_OffState()
 enum soundStates
 {
     SoundStart,
-    WaitState,
     CState,
     FState,
     GState,
@@ -90,20 +89,15 @@ enum soundStates
 // C D E F G A B C
 // C F G F E B A G
 const double musicalNotes[8] = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25};
-unsigned char i, button = 0x00;
+unsigned char i;
 
 void Tick()
 {
     switch (soundState)
     {
     case SoundStart:
-        soundState = WaitState;
+        soundState = CState;
         break;
-    case WaitState:
-        if (button)
-        {
-            soundState = CState;
-        }
     case CState:
         soundState = FState;
         break;
@@ -175,7 +169,6 @@ int main(void)
 
     while (1)
     {
-        button = ~PINA & 0x01;
         Tick();
         while (!TimerFlag)
             ;
