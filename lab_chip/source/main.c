@@ -174,7 +174,7 @@ void TickSoundSM()
 }
 
 void TickCombineLEDsSM();
-()
+
 {
     PORTB = threeLEDs | blinkingLED | sound;
 }
@@ -219,7 +219,6 @@ int main(void)
         }
 
         TickCombineLEDsSM();
-        ();
 
         while (!TimerFlag)
             ;
