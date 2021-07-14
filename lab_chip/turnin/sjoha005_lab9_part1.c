@@ -111,7 +111,7 @@ int main(void)
     PORTB = 0x00;
 
     TimerSet(1000);
-    TimerOnState();
+    TimerOn();
 
     LEDState = LEDStart;
     BlinkingLEDState = BlinkingLEDStart;
