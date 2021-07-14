@@ -173,8 +173,7 @@ void TickSoundSM()
     }
 }
 
-void TickCombineLEDsSM();
-
+void TickCombineLEDsSM()
 {
     PORTB = threeLEDs | blinkingLED | sound;
 }
