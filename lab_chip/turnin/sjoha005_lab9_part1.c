@@ -15,13 +15,13 @@
 
 unsigned char threeLEDs = 0x00, blinkingLED = 0x00;
 
-enum LEDStatess
+enum LEDStates
 {
     LEDStart,
     LED1State,
     LED2State,
     LED3State
-} LEDStates;
+} LEDState;
 enum BlinkingLEDStates
 {
     BlinkingLEDStart,
@@ -31,26 +31,26 @@ enum BlinkingLEDStates
 
 void TickThreeLEDsSM()
 {
-    switch (LEDStates)
+    switch (LEDState)
     {
     case LEDStart:
-        LEDStates = LED1State;
+        LEDState = LED1State;
         break;
 
     case LED1State:
-        LEDStates = LED2State;
+        LEDState = LED2State;
         break;
 
     case LED2State:
-        LEDStates = LED3State;
+        LEDState = LED3State;
         break;
 
     case LED3State:
-        LEDStates = LED1State;
+        LEDState = LED1State;
         break;
     }
 
-    switch (LEDStates)
+    switch (LEDState)
     {
     case LED1State:
         threeLEDs = 0x01;
@@ -110,37 +110,19 @@ int main(void)
     DDRB = 0xFF;
     PORTB = 0x00;
 
-    unsigned long ThreeLEDs_elapsedTime = 300, BlinkingLED_elapsedTime = 1000;
-    const unsigned long timerPeriod = 100;
+    TimerSet(1000);
+    TimerOnState();
 
-    PORTB = 0x00;
-
-    TimerSet(timerPeriod);
-    TimerOn();
-
-    LEDStates = LEDStart;
+    LEDState = LEDStart;
     BlinkingLEDState = BlinkingLEDStart;
 
     while (1)
     {
-        if (ThreeLEDs_elapsedTime > 301)
-        {
-            TickThreeLEDsSM();
-            ThreeLEDs_elapsedTime = 0;
-        }
-
-        if (BlinkingLED_elapsedTime > 1001)
-        {
-            TickBlinkingLEDsSM();
-            BlinkingLED_elapsedTime = 0;
-        }
-
+        TickThreeLEDsSM();
+        TickBlinkingLEDsSM();
         TickCombineLEDsSM();
-
         while (!TimerFlag)
             ;
         TimerFlag = 0;
-        ThreeLEDs_elapsedTime += timerPeriod;
-        BlinkingLED_elapsedTime += timerPeriod;
     }
 }
