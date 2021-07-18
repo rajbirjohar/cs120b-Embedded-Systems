@@ -32,7 +32,6 @@ void transmit_data(unsigned char data)
     PORTC = 0x00;
 }
 
-unsigned char incrementButton = 0x00, decrementButton = 0x00, tempC = 0x00;
 
 enum buttonStates
 {
@@ -185,7 +184,7 @@ int main(void)
     PORTC = 0x00;
 
     buttonState = startButton;
-    tempC = 0x07;
+    tempC = 0x00;
 
     while (1)
     {
