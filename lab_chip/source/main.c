@@ -43,6 +43,8 @@ enum lightsStates
     WaitState2
 } lightsState;
 
+unsigned char tempC = 0x00;
+
 void Tick()
 {
     switch (lightsState)
@@ -121,24 +123,24 @@ void Tick()
     switch (lightsState)
     {
     case StartState:
-        transmit_data(0x30);
+        tempC = 0x30;
         break;
 
     case WaitState:
-        transmit_data(0x03);
+        tempC = 0x03;
         break;
 
     case HalfState:
         break;
 
     case WaitState1:
-        transmit_data(0x0C);
+        tempC = 0x0C;
 
     case EndState:
         break;
 
     case WaitState2:
-        transmit_data(0x03);
+        tempC = 0x30;
         break;
 
     default:
@@ -158,6 +160,7 @@ int main(void)
     while (1)
     {
         Tick();
+	transmit_data(tempC);
     }
 
     return 1;
