@@ -38,10 +38,7 @@ int main(void)
     PORTA = 0xFF;
     DDRC = 0xFF;
     PORTC = 0x00;
-    transmit_data();
-    while (1)
-    {
-    }
-
+    unsigned char tempC = 0x0F;
+    transmit_data(tempC);
     return 1;
 }
