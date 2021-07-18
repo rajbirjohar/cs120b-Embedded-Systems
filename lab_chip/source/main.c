@@ -60,11 +60,11 @@ void Tick()
         {
             buttonState = ResetState;
         }
-        else if (IncrementStateButton)
+        else if (IncrementStateButton && !DecrementStateButton)
         {
             buttonState = IncrementState;
         }
-        else if (DecrementStateButton)
+        else if (DecrementStateButton && !IncrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -84,7 +84,7 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (DecrementStateButton)
+        else if (DecrementStateButton && !IncrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -104,7 +104,7 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (IncrementStateButton)
+        else if (IncrementStateButton && !DecrementStateButton)
         {
             buttonState = IncrementState;
         }
@@ -130,11 +130,11 @@ void Tick()
         {
             buttonState = InitialState;
         }
-        else if (IncrementStateButton)
+        else if (IncrementStateButton && !DecrementStateButton)
         {
             buttonState = IncrementState;
         }
-        else if (DecrementStateButton)
+        else if (DecrementStateButton && !IncrementStateButton)
         {
             buttonState = DecrementState;
         }
@@ -154,7 +154,7 @@ void Tick()
         break;
 
     case IncrementState:
-        if (tempC < 9)
+        if (tempC < 255)
         {
             tempC = tempC + 1;
         }
@@ -184,7 +184,6 @@ int main(void)
     PORTC = 0x00;
 
     buttonState = startButton;
-    tempC = 0x00;
 
     while (1)
     {
