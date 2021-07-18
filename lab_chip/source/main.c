@@ -40,5 +40,9 @@ int main(void)
     PORTC = 0x00;
     unsigned char tempC = 0x0F;
     transmit_data(tempC);
+    while (1)
+    {
+        ;
+    }
     return 1;
 }
