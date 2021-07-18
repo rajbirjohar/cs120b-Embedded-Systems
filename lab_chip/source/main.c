@@ -32,143 +32,113 @@ void transmit_data(unsigned char data)
     PORTC = 0x00;
 }
 
-
-enum buttonStates
+enum lightsStates
 {
-    startButton,
-    InitialState,
+    LightsOn,
+    StartState,
     WaitState,
+    HalfState,
     WaitState1,
-    WaitState2,
-    IncrementState,
-    DecrementState,
-    ResetState
-} buttonState;
-
-unsigned char IncrementStateButton = 0x00, DecrementStateButton = 0x00, tempC = 0x00;
+    EndState,
+    WaitState2
+} lightsState;
 
 void Tick()
 {
-    switch (buttonState)
+    switch (lightsState)
     {
-    case startButton:
-        buttonState = InitialState;
+    case LightsOn:
+        lightsState = StartState;
         break;
 
-    case InitialState:
-        if (IncrementStateButton && DecrementStateButton)
+    case StartState:
+        if (~PINA & 0x01)
         {
-            buttonState = ResetState;
-        }
-        else if (IncrementStateButton && !DecrementStateButton)
-        {
-            buttonState = IncrementState;
-        }
-        else if (DecrementStateButton && !IncrementStateButton)
-        {
-            buttonState = DecrementState;
+            lightsState = WaitState;
         }
         else
         {
-            buttonState = InitialState;
-        }
-        break;
-
-    case IncrementState:
-    case WaitState1:
-        if (IncrementStateButton && DecrementStateButton)
-        {
-            buttonState = ResetState;
-        }
-        else if (!IncrementStateButton && !DecrementStateButton)
-        {
-            buttonState = InitialState;
-        }
-        else if (DecrementStateButton && !IncrementStateButton)
-        {
-            buttonState = DecrementState;
-        }
-        else
-        {
-            buttonState = WaitState1;
-        }
-        break;
-
-    case DecrementState:
-    case WaitState2:
-        if (IncrementStateButton && DecrementStateButton)
-        {
-            buttonState = ResetState;
-        }
-        else if (!IncrementStateButton && !DecrementStateButton)
-        {
-            buttonState = InitialState;
-        }
-        else if (IncrementStateButton && !DecrementStateButton)
-        {
-            buttonState = IncrementState;
-        }
-        else
-        {
-            buttonState = WaitState2;
-        }
-        break;
-
-    case ResetState:
-        if (!IncrementStateButton && !DecrementStateButton)
-        {
-            buttonState = InitialState;
-        }
-        else
-        {
-            buttonState = WaitState;
+            lightsState = StartState;
         }
         break;
 
     case WaitState:
-        if (!IncrementStateButton && !DecrementStateButton)
+        if (!(~PINA & 0x01))
         {
-            buttonState = InitialState;
-        }
-        else if (IncrementStateButton && !DecrementStateButton)
-        {
-            buttonState = IncrementState;
-        }
-        else if (DecrementStateButton && !IncrementStateButton)
-        {
-            buttonState = DecrementState;
+            lightsState = HalfState;
         }
         else
         {
-            buttonState = WaitState;
+            lightsState = WaitState;
+        }
+        break;
+
+    case HalfState:
+        if (~PINA & 0x01)
+        {
+            lightsState = WaitState1;
+        }
+        else
+        {
+            lightsState = HalfState;
+        }
+        break;
+
+    case WaitState1:
+        if (!(~PINA & 0x01))
+        {
+            lightsState = EndState;
+        }
+        else
+        {
+            lightsState = WaitState1;
+        }
+        break;
+
+    case EndState:
+        if (~PINA & 0x01)
+        {
+            lightsState = WaitState2;
+        }
+        else
+        {
+            lightsState = EndState;
+        }
+        break;
+
+    case WaitState2:
+        if (!(~PINA & 0x01))
+        {
+            lightsState = StartState;
+        }
+        else
+        {
+            lightsState = WaitState2;
         }
         break;
     }
 
-    switch (buttonState)
+    switch (lightsState)
     {
-    case InitialState:
+    case StartState:
+        transmit_data(0x30);
+        break;
+
     case WaitState:
+        transmit_data(0x03);
+        break;
+
+    case HalfState:
+        break;
+
     case WaitState1:
+        transmit_data(0x0C);
+
+    case EndState:
+        break;
+
     case WaitState2:
-        break;
-
-    case IncrementState:
-        if (tempC < 255)
-        {
-            tempC = tempC + 1;
-        }
-        break;
-
-    case DecrementState:
-        if (tempC > 0)
-        {
-            tempC = tempC - 1;
-        }
-        break;
-
-    case ResetState:
-        tempC = 0;
+        transmit_data(0x03);
         break;
 
     default:
@@ -183,15 +153,11 @@ int main(void)
     DDRC = 0xFF;
     PORTC = 0x00;
 
-    buttonState = startButton;
+    lightsState = LightsOn;
 
     while (1)
     {
-        IncrementStateButton = PINA & 0x01;
-        DecrementStateButton = PINA & 0x02;
-        DecrementStateButton = (DecrementStateButton >> 1);
         Tick();
-        transmit_data(tempC);
     }
 
     return 1;
