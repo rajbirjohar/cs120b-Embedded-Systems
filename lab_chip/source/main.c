@@ -13,218 +13,34 @@
 #include "simAVRHeader.h"
 #endif
 
-unsigned char threeLEDs = 0x00, blinkingLED = 0x00, sound = 0x00, button = 0x00;
-
-enum LEDStates
+void transmit_data(unsigned char data)
 {
-    LEDStart,
-    LED1State,
-    LED2State,
-    LED3State
-} LEDState;
-
-enum BlinkingLEDStates
-{
-    BlinkingLEDStart,
-    OnState,
-    OffState
-} BlinkingLEDState;
-
-enum SoundStates
-{
-    SoundStart,
-    SoundOnState,
-    SoundOffState,
-    SoundContinueState
-} SoundState;
-
-void TickThreeLEDsSM()
-{
-    switch (LEDState)
+    int i;
+    for (i = 0; i < 8; ++i)
     {
-    case LEDStart:
-        LEDState = LED1State;
-        break;
-
-    case LED1State:
-        LEDState = LED2State;
-        break;
-
-    case LED2State:
-        LEDState = LED3State;
-        break;
-
-    case LED3State:
-        LEDState = LED1State;
-        break;
+        // Sets SRCLR to 1 allowing data to be set
+        // Also clears SRCLK in preparation of sending data
+        PORTC = 0x08;
+        // set SER = next bit of data to be sent.
+        PORTC |= ((data >> i) & 0x01);
+        // set SRCLK = 1. Rising edge shifts next bit of data into the shift register
+        PORTC |= 0x02;
     }
-
-    switch (LEDState)
-    {
-    case LED1State:
-        threeLEDs = 0x01;
-        break;
-
-    case LED2State:
-        threeLEDs = 0x02;
-        break;
-
-    case LED3State:
-        threeLEDs = 0x04;
-        break;
-
-    default:
-        break;
-    }
-}
-
-void TickBlinkingLEDsSM()
-{
-    switch (BlinkingLEDState)
-    {
-    case BlinkingLEDStart:
-        BlinkingLEDState = OnState;
-        break;
-
-    case OnState:
-        BlinkingLEDState = OffState;
-        break;
-
-    case OffState:
-        BlinkingLEDState = OnState;
-        break;
-    }
-
-    switch (BlinkingLEDState)
-    {
-    case OnState:
-        blinkingLED = 0x08;
-        break;
-
-    case OffState:
-        blinkingLED = 0x00;
-        break;
-
-    default:
-        break;
-    }
-}
-
-void TickSoundSM()
-{
-    button = ~PINA & 0x04;
-
-    switch (SoundState)
-    {
-    case SoundStart:
-        SoundState = SoundOffState;
-        break;
-
-    case SoundOnState:
-        if (button)
-        {
-            SoundState = SoundContinueState;
-        }
-        else
-        {
-            SoundState = SoundOffState;
-        }
-        break;
-
-    case SoundOffState:
-        if (button)
-        {
-            SoundState = SoundOnState;
-        }
-        else
-        {
-            SoundState = SoundOffState;
-        }
-        break;
-
-    case SoundContinueState:
-        if (button)
-        {
-            SoundState = SoundOnState;
-        }
-        else
-        {
-            SoundState = SoundOffState;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    switch (SoundState)
-    {
-    case SoundOffState:
-    case SoundContinueState:
-        sound = 0x00;
-        break;
-
-    case SoundOnState:
-        sound = 0x10;
-        break;
-
-    default:
-        break;
-    }
-}
-
-void TickCombineLEDsSM()
-{
-    PORTB = threeLEDs | blinkingLED | sound;
+    // set RCLK = 1. Rising edge copies data from “Shift” register to “Storage” register
+    PORTC |= 0x04;
+    // clears all lines in preparation of a new transmission
+    PORTC = 0x00;
 }
 
 int main(void)
 {
     DDRA = 0x00;
     PORTA = 0xFF;
-    DDRB = 0xFF;
-    PORTB = 0x00;
-
-    unsigned long LEDElapsedTime = 300, BlinkingLEDElapsedTime = 1000, SoundElapsedTime = 2;
-    const unsigned long period = 1;
-
-    PORTB = 0x00;
-
-    TimerSet(period);
-    TimerOn();
-
-    LEDState = LEDStart;
-    BlinkingLEDState = BlinkingLEDStart;
-    SoundState = SoundStart;
-
+    DDRC = 0xFF;
+    PORTC = 0x00;
+    transmit_data();
     while (1)
     {
-        if (LEDElapsedTime > 301)
-        {
-            TickThreeLEDsSM();
-            LEDElapsedTime = 0;
-        }
-
-        if (BlinkingLEDElapsedTime > 1001)
-        {
-            TickBlinkingLEDsSM();
-            BlinkingLEDElapsedTime = 0;
-        }
-
-        if (SoundElapsedTime > 3)
-        {
-            TickSoundSM();
-            SoundElapsedTime = 0;
-        }
-
-        TickCombineLEDsSM();
-
-        while (!TimerFlag)
-            ;
-        TimerFlag = 0;
-        LEDElapsedTime += period;
-        BlinkingLEDElapsedTime += period;
-        SoundElapsedTime += period;
     }
 
     return 1;
