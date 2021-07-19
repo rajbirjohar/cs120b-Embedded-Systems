@@ -160,7 +160,7 @@ int main(void)
     PORTC = 0x00;
 
     lightsState = LightsOn;
-    void transmit_data(tempC);
+    transmit_data(tempC);
     while (1)
     {
         Tick();
