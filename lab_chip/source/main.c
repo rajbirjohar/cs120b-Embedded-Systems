@@ -124,10 +124,12 @@ void Tick()
     {
     case StartState:
         tempC = 0x30;
+        transmit_data(tempC);
         break;
 
     case WaitState:
         tempC = 0x03;
+        transmit_data(tempC);
         break;
 
     case HalfState:
@@ -135,12 +137,14 @@ void Tick()
 
     case WaitState1:
         tempC = 0x0C;
+        transmit_data(tempC);
 
     case EndState:
         break;
 
     case WaitState2:
         tempC = 0x30;
+        transmit_data(tempC);
         break;
 
     default:
@@ -160,7 +164,6 @@ int main(void)
     while (1)
     {
         Tick();
-	transmit_data(tempC);
     }
 
     return 1;
