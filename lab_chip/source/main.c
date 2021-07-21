@@ -17,7 +17,7 @@
 task tasks[4];
 
 const unsigned char tasksNum = 4;
-const unsigned long taskGCDPeriod = 1, p1Period = 5, p1PeriodButtons = 10, AIPeriod = 10, ballPeriod = 500;     
+const unsigned long taskGCDPeriod = 1, p1Period = 5, p1PeriodButtons = 10, AIPeriod = 10, ballPeriod = 500;
 
 int main(void)
 {
