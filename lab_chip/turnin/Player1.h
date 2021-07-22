@@ -109,4 +109,4 @@ int TickPlayer1(int state)
     return state;
 }
 
-#endif /* PLAYER1_H_ */
+#endif

@@ -1,5 +1,5 @@
-#ifndef Player1BUTTONS_H_
-#define Player1BUTTONS_H_
+#ifndef P1BUTTONS_H_
+#define P1BUTTONS_H_
 
 unsigned char player1Left = 0x00;
 unsigned char player1Right = 0x00;
@@ -34,4 +34,4 @@ int TickPlayer1Buttons(int state)
     return state;
 }
 
-#endif /* Player1BUTTONS_H_ */
+#endif

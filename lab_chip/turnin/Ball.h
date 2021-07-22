@@ -13,15 +13,15 @@ unsigned char ballRow[5] = {0xFE, 0xFD, 0xFB, 0xF7, 0xEF};
 
 enum BallState
 {
-    P1StartState,
-    P1BallMiddle,
-    P1BallLeft,
-    P1BallRight,
+    Player1StartState,
+    Player1BallMiddle,
+    Player1BallLeft,
+    Player1BallRight,
     AITurnState,
     AIBallMiddle,
     AIBallLeft,
     AIBallRight,
-    P1TurnState,
+    Player1TurnState,
     GameOverState
 };
 int TickBall(int state)
@@ -32,15 +32,15 @@ int TickBall(int state)
     switch (state)
     {
     // Game starts with ball moving towards Player 1
-    case P1StartState:
-        if (ballPattern[l] == P1pattern)
+    case Player1StartState:
+        if (ballPattern[l] == Player1pattern)
         {
             if (i == 1)
             { // Paddle in the middle
                 computation = (ballRow[k] >> i) & 0x07;
                 if (computation == 5)
                 {
-                    state = P1BallMiddle;
+                    state = Player1BallMiddle;
                 }
             }
             else if (i == 2)
@@ -48,7 +48,7 @@ int TickBall(int state)
                 computation = (ballRow[k] >> i) & 0x07;
                 if (computation == 6)
                 {
-                    state = P1BallLeft;
+                    state = Player1BallLeft;
                 }
             }
             else if (i == 0)
@@ -56,28 +56,28 @@ int TickBall(int state)
                 computation = (ballRow[k] >> i) & 0x07;
                 if (computation == 3)
                 {
-                    state = P1BallRight;
+                    state = Player1BallRight;
                 }
             }
         }
         else
         {
-            state = P1StartState;
+            state = Player1StartState;
         }
         break;
     // Cases where it becomes the AI turns after the ball hits the paddle
-    case P1BallMiddle:
+    case Player1BallMiddle:
         if (ballPattern[l] == AIpattern)
         {
             state = AITurnState;
         }
         else
         {
-            state = P1BallMiddle;
+            state = Player1BallMiddle;
         }
         break;
 
-    case P1BallLeft:
+    case Player1BallLeft:
         if (ballPattern[l] == AIpattern)
         {
             state = AITurnState;
@@ -86,15 +86,15 @@ int TickBall(int state)
 
         if (ballRow[k] == 0xFE)
         {
-            state = P1BallRight;
+            state = Player1BallRight;
         }
         else
         {
-            state = P1BallLeft;
+            state = Player1BallLeft;
         }
         break;
 
-    case P1BallRight:
+    case Player1BallRight:
         if (ballPattern[l] == AIpattern)
         {
             state = AITurnState;
@@ -103,11 +103,11 @@ int TickBall(int state)
 
         if (ballRow[k] == 0xEF)
         {
-            state = P1BallLeft;
+            state = Player1BallLeft;
         }
         else
         {
-            state = P1BallRight;
+            state = Player1BallRight;
         }
         break;
     // It is now the AI's turn
@@ -184,9 +184,9 @@ int TickBall(int state)
         break;
     // Cases where the ball will hit AI's paddle
     case AIBallMiddle:
-        if (ballPattern[l] == P1pattern)
+        if (ballPattern[l] == Player1pattern)
         {
-            state = P1TurnState;
+            state = Player1TurnState;
         }
         else
         {
@@ -195,9 +195,9 @@ int TickBall(int state)
         break;
 
     case AIBallRight:
-        if (ballPattern[l] == P1pattern)
+        if (ballPattern[l] == Player1pattern)
         {
-            state = P1TurnState;
+            state = Player1TurnState;
             break;
         }
 
@@ -212,9 +212,9 @@ int TickBall(int state)
         break;
 
     case AIBallLeft:
-        if (ballPattern[l] == P1pattern)
+        if (ballPattern[l] == Player1pattern)
         {
-            state = P1TurnState;
+            state = Player1TurnState;
             break;
         }
 
@@ -228,7 +228,7 @@ int TickBall(int state)
         }
         break;
     // Cases where it is now the players turn
-    case P1TurnState:
+    case Player1TurnState:
         if (i == 1)
         {
             if (ballRow[k] == 0xFE || ballRow[k] == 0xEF)
@@ -240,15 +240,15 @@ int TickBall(int state)
                 computation = (ballRow[k] >> i) & 0x07;
                 if (computation == 3)
                 {
-                    state = P1BallRight;
+                    state = Player1BallRight;
                 }
                 else if (computation == 5)
                 {
-                    state = P1BallMiddle;
+                    state = Player1BallMiddle;
                 }
                 else if (computation == 6)
                 {
-                    state = P1BallLeft;
+                    state = Player1BallLeft;
                 }
             }
         }
@@ -263,15 +263,15 @@ int TickBall(int state)
                 computation = ballRow[k] & 0x07;
                 if (computation == 3)
                 {
-                    state = P1BallRight;
+                    state = Player1BallRight;
                 }
                 else if (computation == 5)
                 {
-                    state = P1BallMiddle;
+                    state = Player1BallMiddle;
                 }
                 else if (computation == 6)
                 {
-                    state = P1BallLeft;
+                    state = Player1BallLeft;
                 }
             }
         }
@@ -286,15 +286,15 @@ int TickBall(int state)
                 computation = (ballRow[k] >> i) & 0x07;
                 if (computation == 3)
                 {
-                    state = P1BallRight;
+                    state = Player1BallRight;
                 }
                 else if (computation == 5)
                 {
-                    state = P1BallMiddle;
+                    state = Player1BallMiddle;
                 }
                 else if (computation == 6)
                 {
-                    state = P1BallLeft;
+                    state = Player1BallLeft;
                 }
             }
         }
@@ -305,7 +305,7 @@ int TickBall(int state)
         {
             l = 4;
             k = 2;
-            state = P1StartState;
+            state = Player1StartState;
         }
         else
         {
@@ -314,27 +314,27 @@ int TickBall(int state)
         break;
 
     default:
-        state = P1StartState;
+        state = Player1StartState;
         break;
     }
 
     switch (state)
     {
-    case P1StartState:
+    case Player1StartState:
         --l;
         break;
     // Shift ball to the right once
-    case P1BallMiddle:
+    case Player1BallMiddle:
         ++l;
         break;
     // Shift ball to the right once.
     // Shift ball row upward
-    case P1BallLeft:
+    case Player1BallLeft:
         ++l;
         --k;
         break;
 
-    case P1BallRight:
+    case Player1BallRight:
         ++l;
         ++k;
         break;
@@ -357,7 +357,7 @@ int TickBall(int state)
         --l;
         ++k;
         break;
-    case P1TurnState:
+    case Player1TurnState:
         break;
 
     case GameOverState:
@@ -372,4 +372,4 @@ int TickBall(int state)
     return state;
 };
 
-#endif /* BALL_H_ */
+#endif
