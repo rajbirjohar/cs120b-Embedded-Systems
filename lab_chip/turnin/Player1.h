@@ -1,82 +1,81 @@
 #ifndef PLAYER1_H_
 #define PLAYER1_H_
 
-#include "P1Buttons.h"
-
-const unsigned char P1pattern = 0x80;              // Player 1's Paddle
-const unsigned char P1row[3] = {0xF8, 0xF1, 0xE3}; // Player 1's Paddle Positions
+#include "Player1Buttons.h"
+// Player's possible positions
+const unsigned char Player1paddle = 0x80, Player1row[3] = {0xF8, 0xF1, 0xE3};
 static unsigned char i = 1;
 
-enum P1States
+enum Player1States
 {
-    P1WaitState,
-    P1LeftState,
-    P1RightState,
-    P1WaitStateRelease
+    Player1WaitState,
+    Player1LeftState,
+    Player1RightState,
+    Player1WaitStateRelease
 };
 int TickPlayer1(int state)
 {
     switch (state)
     {
-    case P1WaitState:
-        if (p1Left && !p1Right)
+    case Player1WaitState:
+        if (player1Left && !player1Right)
         {
-            state = P1LeftState;
+            state = Player1LeftState;
         }
-        else if (!p1Left && p1Right)
+        else if (!player1Left && player1Right)
         {
-            state = P1RightState;
-        }
-        else
-        {
-            state = P1WaitState;
-        }
-        break;
-
-    case P1LeftState:
-        if (!p1Left && !p1Right)
-        {
-            state = P1WaitState;
-        }
-        else if (p1Left && !p1Right)
-        {
-            state = P1WaitStateRelease;
-        }
-        break;
-
-    case P1RightState:
-        if (!p1Left && !p1Right)
-        {
-            state = P1WaitState;
-        }
-        else if (!p1Left && p1Right)
-        {
-            state = P1WaitStateRelease;
-        }
-        break;
-
-    case P1WaitStateRelease:
-        if (!p1Left && !p1Right)
-        {
-            state = P1WaitState;
+            state = Player1RightState;
         }
         else
         {
-            state = P1WaitStateRelease;
+            state = Player1WaitState;
+        }
+        break;
+
+    case Player1LeftState:
+        if (!player1Left && !player1Right)
+        {
+            state = Player1WaitState;
+        }
+        else if (player1Left && !player1Right)
+        {
+            state = Player1WaitStateRelease;
+        }
+        break;
+
+    case Player1RightState:
+        if (!player1Left && !player1Right)
+        {
+            state = Player1WaitState;
+        }
+        else if (!player1Left && player1Right)
+        {
+            state = Player1WaitStateRelease;
+        }
+        break;
+
+    case Player1WaitStateRelease:
+        if (!player1Left && !player1Right)
+        {
+            state = Player1WaitState;
+        }
+        else
+        {
+            state = Player1WaitStateRelease;
         }
         break;
 
     default:
-        state = P1WaitState;
+        state = Player1WaitState;
         break;
     }
 
     switch (state)
     {
-    case P1WaitState:
+    case Player1WaitState:
         break;
 
-    case P1LeftState:
+    case Player1LeftState:
         if (i <= 0)
         {
             i = 0;
@@ -87,7 +86,7 @@ int TickPlayer1(int state)
         }
         break;
 
-    case P1RightState:
+    case Player1RightState:
         if (i >= 2)
         {
             i = 2;
@@ -98,15 +97,15 @@ int TickPlayer1(int state)
         }
         break;
 
-    case P1WaitStateRelease:
+    case Player1WaitStateRelease:
         break;
 
     default:
         break;
     }
 
-    PORTC = P1pattern;
-    PORTD = P1row[i];
+    PORTC = Player1paddle;
+    PORTD = Player1row[i];
     return state;
 }
 

@@ -3,8 +3,8 @@
 
 #include "Ball.h"
 
-const unsigned char AIpattern = 0x01; // AI's Paddle
-const unsigned char AIrow[3] = {0xF8, 0xF1, 0xE3}; // AI's Paddle Positions
+ // AI's possible positions
+const unsigned char AIpaddle = 0x01 AIrow[3] = {0xF8, 0xF1, 0xE3};
 static unsigned char j = 1;
 
 enum AIStates
@@ -93,7 +93,7 @@ int TickAI(int state)
         break;
     }
 
-    PORTC = AIpattern;
+    PORTC = AIpaddle;
     PORTD = AIrow[j];
     return state;
 };

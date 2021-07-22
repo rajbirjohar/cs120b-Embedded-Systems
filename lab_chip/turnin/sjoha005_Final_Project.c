@@ -30,22 +30,22 @@ int main(void)
     DDRD = 0xFF;
     PORTD = 0x00;
 
-    tasks[0].state = P1WaitState;
+    tasks[0].state = Player1WaitState;
     tasks[0].period = p1Period;
     tasks[0].elapsedTime = tasks[0].period;
     tasks[0].TickFct = &TickPlayer1;
 
-    tasks[1].state = P1ButtonsWaitState;
+    tasks[1].state = Player1ButtonsWaitState;
     tasks[1].period = p1PeriodButtons;
     tasks[1].elapsedTime = tasks[1].period;
-    tasks[1].TickFct = &TickP1Buttons;
+    tasks[1].TickFct = &TickPlayer1Buttons;
 
     tasks[2].state = AIWaitState;
     tasks[2].period = AIPeriod;
     tasks[2].elapsedTime = tasks[2].period;
     tasks[2].TickFct = &TickAI;
 
-    tasks[3].state = P1Start;
+    tasks[3].state = Player1Start;
     tasks[3].period = ballPeriod;
     tasks[3].elapsedTime = tasks[3].period;
     tasks[3].TickFct = &TickBall;

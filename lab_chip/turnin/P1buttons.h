@@ -1,30 +1,30 @@
-#ifndef P1BUTTONS_H_
-#define P1BUTTONS_H_
+#ifndef Player1BUTTONS_H_
+#define Player1BUTTONS_H_
 
-unsigned char p1Left = 0x00;
-unsigned char p1Right = 0x00;
+unsigned char player1Left = 0x00;
+unsigned char player1Right = 0x00;
 
-enum P1ButtonsStates
+enum Player1ButtonsStates
 {
-    P1ButtonsWaitState
+    Player1ButtonsWaitState
 };
-int TickP1Buttons(int state)
+int TickPlayer1Buttons(int state)
 {
     switch (state)
     {
-    case P1ButtonsWaitState:
+    case Player1ButtonsWaitState:
         break;
 
     default:
-        state = P1ButtonsWaitState;
+        state = Player1ButtonsWaitState;
         break;
     }
 
     switch (state)
     {
-    case P1ButtonsWaitState:
-        p1Left = ~PINB & 0x01;
-        p1Right = ~PINB & 0x02;
+    case Player1ButtonsWaitState:
+        player1Left = ~PINB & 0x01;
+        player1Right = ~PINB & 0x02;
         break;
 
     default:
@@ -34,4 +34,4 @@ int TickP1Buttons(int state)
     return state;
 }
 
-#endif /* P1BUTTONS_H_ */
+#endif /* Player1BUTTONS_H_ */
