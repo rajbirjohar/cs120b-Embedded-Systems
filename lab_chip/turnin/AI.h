@@ -3,9 +3,9 @@
 
 #include "Ball.h"
 
-/const unsigned char AIpattern = 0x01; // AI's Paddle
+// const unsigned char AIpattern = 0x01; // AI's Paddle
 const unsigned char AIrow[3] = {0xF8, 0xF1, 0xE3}; // AI's Paddle Positions
-/static unsigned char j = 1;
+// static unsigned char j = 1;
 
 enum AIStates
 {

@@ -4,6 +4,8 @@
  *	Assignment: Lab #  Exercise #
  *	Exercise Description: [optional - include for your own benefit]
  *  LINK: https://youtu.be/p7K-HIWsxNI
+ *  PARTS COMPLETED:
+ *  Basic requirements AND Advancement 1
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
  */
