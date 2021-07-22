@@ -76,7 +76,7 @@ int TickPlayer1(int state)
         break;
 
     case Player1LeftState:
-        if (i <= 0)
+        if (i < 1)
         {
             i = 0;
         }
@@ -87,7 +87,7 @@ int TickPlayer1(int state)
         break;
 
     case Player1RightState:
-        if (i >= 2)
+        if (i > 3)
         {
             i = 2;
         }
